@@ -10,6 +10,7 @@ const devices = [
     watts: 50,
     hours: 4,
     icon: 'monitor',
+    allowCustomWatts: true,
     variants: [
       { id: 'monitor-small', label: 'До 27″ — 50 Вт', watts: 50 },
       { id: 'monitor-large', label: 'Від 27″ — 70 Вт', watts: 70 },
@@ -23,6 +24,7 @@ const devices = [
     watts: 150,
     hours: 4,
     icon: 'desktop',
+    allowCustomWatts: true,
     variants: [
       { id: 'pc-office', label: 'Офісний — 150 Вт', watts: 150 },
       { id: 'pc-gaming', label: 'Ігровий — 500 Вт', watts: 500 },
@@ -378,6 +380,7 @@ const state = new Map(
   devices.map((device) => {
     const hasVariants = Array.isArray(device.variants) && device.variants.length > 0;
     const initialVariant = hasVariants ? device.variants[0] : null;
+    const initialWatts = initialVariant ? initialVariant.watts : device.watts;
 
     return [
       device.id,
@@ -385,7 +388,11 @@ const state = new Map(
         ...device,
         quantity: 0,
         variantId: initialVariant ? initialVariant.id : null,
-        watts: initialVariant ? initialVariant.watts : device.watts
+        watts: initialWatts,
+        hours: device.hours,
+        timeUnit: 'hours',
+        timeValue: device.hours,
+        customWatts: device.allowCustomWatts ? initialWatts : null
       }
     ];
   })
@@ -396,8 +403,8 @@ const CONSULTATION_URL = 'https://martin-shop.online/contact/';
 const deviceCategoriesElement = document.getElementById('device-categories');
 const selectedSection = document.getElementById('selected-section');
 const selectedTableBody = document.getElementById('selected-devices');
-const totalPowerEl = document.getElementById('total-power');
 const totalEnergyEl = document.getElementById('total-energy');
+const totalBufferedEl = document.getElementById('total-buffered');
 const recommendationCard = document.getElementById('recommendation-card');
 const matchLabel = document.getElementById('match-label');
 const stationNameEl = document.getElementById('station-name');
@@ -408,8 +415,8 @@ const alternativesSection = document.getElementById('alternatives-section');
 const alternativeListEl = document.getElementById('alternative-list');
 
 const cardRegistry = new Map();
-let previousTotalPower = 0;
 let previousTotalEnergy = 0;
+let previousBufferedEnergy = 0;
 
 function showSelectedSection() {
   if (!selectedSection) {
@@ -503,7 +510,15 @@ function animateMetric(element, from, to, suffix, decimals = 0, duration = 600) 
 }
 
 function getVariant(device, variantId = device.variantId) {
-  if (!Array.isArray(device.variants)) {
+  if (device && device.allowCustomWatts && variantId === 'custom') {
+    return {
+      id: 'custom',
+      label: `Власне значення — ${formatNumber(device.watts)} Вт`,
+      watts: device.watts
+    };
+  }
+
+  if (!Array.isArray(device?.variants)) {
     return null;
   }
   return device.variants.find((variant) => variant.id === variantId) || device.variants[0] || null;
@@ -511,9 +526,23 @@ function getVariant(device, variantId = device.variantId) {
 
 function getDeviceMetaText(device) {
   const variant = getVariant(device);
-  const powerText = variant ? variant.label : `${formatNumber(device.watts)} Вт`;
-  const hoursText = typeof device.hours === 'number' ? `${formatNumber(device.hours, device.hours % 1 === 0 ? 0 : 1)} год` : '';
-  return hoursText ? `${powerText} • ${hoursText}` : powerText;
+  let powerText = variant ? variant.label : `${formatNumber(device.watts)} Вт`;
+
+  if (device.allowCustomWatts && device.variantId === 'custom') {
+    powerText = `Власне значення — ${formatNumber(device.watts)} Вт`;
+  }
+
+  let durationText = '';
+  if (typeof device.timeValue === 'number') {
+    if (device.timeUnit === 'minutes') {
+      durationText = `${formatNumber(device.timeValue, 0)} хв`;
+    } else {
+      const digits = device.timeValue % 1 === 0 ? 0 : 1;
+      durationText = `${formatNumber(device.timeValue, digits)} год`;
+    }
+  }
+
+  return durationText ? `${powerText} • ${durationText}` : powerText;
 }
 
 function setQuantity(id, quantity) {
@@ -529,21 +558,103 @@ function adjustQuantity(id, delta) {
   setQuantity(id, device.quantity + delta);
 }
 
-function setHours(id, hours) {
+function setTimeValue(id, value) {
   const device = state.get(id);
   if (!device) return;
-  const nextValue = Number(hours);
-  if (!Number.isFinite(nextValue)) {
+
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    device.timeValue = 0;
+    device.hours = 0;
+    updateInterface();
     return;
   }
-  const clamped = Math.max(0, Math.min(24, nextValue));
-  device.hours = Math.round(clamped * 10) / 10;
+
+  const max = device.timeUnit === 'minutes' ? 24 * 60 : 24;
+  const precision = device.timeUnit === 'minutes' ? 1 : 10;
+  const clamped = Math.max(0, Math.min(max, numeric));
+  device.timeValue = Math.round(clamped * precision) / precision;
+  device.hours = device.timeUnit === 'minutes' ? device.timeValue / 60 : device.timeValue;
   updateInterface();
+}
+
+function adjustTimeValue(id, direction) {
+  const device = state.get(id);
+  if (!device) return;
+  const step = device.timeUnit === 'minutes' ? 5 : 0.5;
+  setTimeValue(id, device.timeValue + step * direction);
+}
+
+function setTimeUnit(id, unit) {
+  if (unit !== 'hours' && unit !== 'minutes') {
+    return;
+  }
+
+  const device = state.get(id);
+  if (!device) {
+    return;
+  }
+
+  if (device.timeUnit === unit) {
+    return;
+  }
+
+  device.timeUnit = unit;
+  if (unit === 'hours') {
+    device.timeValue = Math.round(device.hours * 10) / 10;
+  } else {
+    device.timeValue = Math.round(device.hours * 60);
+  }
+  updateInterface();
+}
+
+function setCustomWatts(id, watts) {
+  const device = state.get(id);
+  if (!device || !device.allowCustomWatts) {
+    return;
+  }
+
+  const numeric = Number(watts);
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    device.customWatts = null;
+    if (device.variantId === 'custom') {
+      device.watts = 0;
+      updateInterface();
+    }
+    return;
+  }
+
+  const rounded = Math.round(numeric);
+  device.customWatts = rounded;
+  if (device.variantId === 'custom') {
+    device.watts = rounded;
+    updateInterface();
+  }
 }
 
 function setVariant(id, variantId) {
   const device = state.get(id);
   if (!device || !Array.isArray(device.variants)) {
+    if (device && device.allowCustomWatts && variantId === 'custom') {
+      device.variantId = 'custom';
+      if (Number.isFinite(device.customWatts)) {
+        device.watts = device.customWatts;
+      } else {
+        device.watts = 0;
+      }
+      updateInterface();
+    }
+    return;
+  }
+
+  if (device.allowCustomWatts && variantId === 'custom') {
+    device.variantId = 'custom';
+    if (Number.isFinite(device.customWatts)) {
+      device.watts = device.customWatts;
+    } else {
+      device.watts = 0;
+    }
+    updateInterface();
     return;
   }
 
@@ -554,6 +665,9 @@ function setVariant(id, variantId) {
 
   device.variantId = nextVariant.id;
   device.watts = nextVariant.watts;
+  if (device.allowCustomWatts && Number.isFinite(device.customWatts)) {
+    device.customWatts = nextVariant.watts;
+  }
   updateInterface();
 }
 
@@ -714,33 +828,56 @@ function createQuantityControls(device) {
   return { wrapper, input };
 }
 
-function createHourControls(device) {
+function createTimeControls(device) {
   const wrapper = document.createElement('div');
-  wrapper.className = 'hour-controls';
+  wrapper.className = 'time-controls';
+
+  const controls = document.createElement('div');
+  controls.className = 'time-value-controls';
 
   const minus = document.createElement('button');
   minus.type = 'button';
   minus.textContent = '−';
-  minus.addEventListener('click', () => setHours(device.id, device.hours - 0.5));
+  minus.addEventListener('click', () => adjustTimeValue(device.id, -1));
 
   const input = document.createElement('input');
   input.type = 'number';
-  input.step = '0.1';
   input.min = '0';
-  input.max = '24';
-  input.value = String(device.hours);
+  input.max = device.timeUnit === 'minutes' ? '1440' : '24';
+  input.step = device.timeUnit === 'minutes' ? '5' : '0.1';
+  input.value = String(device.timeValue);
   input.addEventListener('input', (event) => {
     const target = event.target;
-    setHours(device.id, target.value);
+    setTimeValue(device.id, target.value);
   });
 
   const plus = document.createElement('button');
   plus.type = 'button';
   plus.textContent = '+';
-  plus.addEventListener('click', () => setHours(device.id, device.hours + 0.5));
+  plus.addEventListener('click', () => adjustTimeValue(device.id, 1));
 
-  wrapper.append(minus, input, plus);
-  return { wrapper, input };
+  controls.append(minus, input, plus);
+
+  const unitSelect = document.createElement('select');
+  unitSelect.className = 'time-unit-select';
+
+  const hoursOption = document.createElement('option');
+  hoursOption.value = 'hours';
+  hoursOption.textContent = 'год';
+
+  const minutesOption = document.createElement('option');
+  minutesOption.value = 'minutes';
+  minutesOption.textContent = 'хв';
+
+  unitSelect.append(hoursOption, minutesOption);
+  unitSelect.value = device.timeUnit;
+  unitSelect.addEventListener('change', (event) => {
+    const target = event.target;
+    setTimeUnit(device.id, target.value);
+  });
+
+  wrapper.append(controls, unitSelect);
+  return { wrapper, input, unitSelect };
 }
 
 function createVariantSelector(device) {
@@ -761,7 +898,14 @@ function createVariantSelector(device) {
     select.appendChild(option);
   });
 
-  select.value = device.variantId || device.variants[0].id;
+  if (device.allowCustomWatts) {
+    const customOption = document.createElement('option');
+    customOption.value = 'custom';
+    customOption.textContent = 'Свій варіант';
+    select.appendChild(customOption);
+  }
+
+  select.value = device.variantId === 'custom' ? 'custom' : device.variantId || device.variants[0].id;
   select.addEventListener('change', (event) => {
     const target = event.target;
     setVariant(device.id, target.value);
@@ -772,6 +916,33 @@ function createVariantSelector(device) {
   currentPower.textContent = `Поточна потужність: ${formatNumber(device.watts)} Вт`;
 
   wrapper.append(select, currentPower);
+
+  if (device.allowCustomWatts) {
+    const customWrapper = document.createElement('div');
+    customWrapper.className = 'custom-watts';
+
+    const customLabel = document.createElement('label');
+    customLabel.textContent = 'Свій варіант, Вт';
+
+    const customInput = document.createElement('input');
+    customInput.type = 'number';
+    customInput.min = '1';
+    customInput.step = '10';
+    customInput.placeholder = 'Наприклад, 320';
+    customInput.value = Number.isFinite(device.customWatts) ? String(device.customWatts) : '';
+    customInput.disabled = select.value !== 'custom';
+    const inputId = `custom-watts-${device.id}`;
+    customInput.id = inputId;
+    customLabel.setAttribute('for', inputId);
+    customInput.addEventListener('input', (event) => {
+      const target = event.target;
+      setCustomWatts(device.id, target.value);
+    });
+
+    customWrapper.append(customLabel, customInput);
+    wrapper.appendChild(customWrapper);
+  }
+
   return { wrapper, select, currentPower };
 }
 
@@ -801,8 +972,8 @@ function renderSelectedDevices(selectedDevices) {
     row.appendChild(powerCell);
 
     const hoursCell = document.createElement('td');
-    const hourControls = createHourControls(device);
-    hoursCell.appendChild(hourControls.wrapper);
+    const timeControls = createTimeControls(device);
+    hoursCell.appendChild(timeControls.wrapper);
     row.appendChild(hoursCell);
 
     const energyCell = document.createElement('td');
@@ -929,13 +1100,7 @@ function renderAlternatives(alternatives, selectedStation) {
     link.rel = 'noopener';
     link.textContent = 'Купити станцію';
 
-    const consult = document.createElement('a');
-    consult.href = CONSULTATION_URL;
-    consult.target = '_blank';
-    consult.rel = 'noopener';
-    consult.textContent = 'Потрібна консультація';
-
-    actions.append(link, consult);
+    actions.append(link);
     card.appendChild(actions);
     alternativeListEl.appendChild(card);
   });
@@ -975,19 +1140,21 @@ function updateInterface() {
   }
   renderSelectedDevices(selectedDevices);
 
-  totalPower = Math.round(totalPower);
   totalEnergy = Math.round(totalEnergy * 10) / 10;
+  const bufferedEnergy = totalEnergy > 0 ? Math.round((totalEnergy / 0.9) * 10) / 10 : 0;
 
   const energyDigits = Number.isInteger(totalEnergy) ? 0 : 1;
-
-  animateMetric(totalPowerEl, previousTotalPower, totalPower, 'Вт', 0);
   animateMetric(totalEnergyEl, previousTotalEnergy, totalEnergy, 'Wh', energyDigits);
 
-  previousTotalPower = totalPower;
-  previousTotalEnergy = totalEnergy;
+  const bufferedDigits = Number.isInteger(bufferedEnergy) ? 0 : 1;
+  animateMetric(totalBufferedEl, previousBufferedEnergy, bufferedEnergy, 'Wh', bufferedDigits);
 
-  const recommendation = getRecommendation(totalPower, totalEnergy);
-  renderRecommendation(recommendation, totalPower, totalEnergy);
+  previousTotalEnergy = totalEnergy;
+  previousBufferedEnergy = bufferedEnergy;
+
+  totalPower = Math.round(totalPower);
+  const recommendation = getRecommendation(totalPower, bufferedEnergy);
+  renderRecommendation(recommendation, totalPower, bufferedEnergy);
 }
 
 renderCategories();

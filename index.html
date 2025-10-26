@@ -40,7 +40,7 @@
                 <th>Пристрій</th>
                 <th>Кількість</th>
                 <th>Потужність, Вт</th>
-                <th>Час роботи, год</th>
+                <th>Час роботи</th>
                 <th>Споживання, Wh</th>
                 <th></th>
               </tr>
@@ -52,14 +52,14 @@
 
       <section class="summary" aria-label="Підсумок">
         <article class="summary-card">
-          <h3>Загальна потужність</h3>
-          <p class="summary-value" id="total-power">0 Вт</p>
-          <p class="summary-helper">Сумарна потужність усіх вибраних пристроїв.</p>
-        </article>
-        <article class="summary-card">
           <h3>Орієнтовне споживання</h3>
           <p class="summary-value" id="total-energy">0 Wh</p>
           <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
+        </article>
+        <article class="summary-card">
+          <h3>Споживання з урахуванням ККД та резерву (≈90%)</h3>
+          <p class="summary-value" id="total-buffered">0 Wh</p>
+          <p class="summary-helper">Запас енергії для інвертора та захисту від глибокого розрядження батареї.</p>
         </article>
         <article class="summary-card recommendation" id="recommendation-card">
           <div class="recommendation-header">

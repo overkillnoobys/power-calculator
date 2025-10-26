@@ -303,6 +303,42 @@ h1 {
   font-weight: 600;
 }
 
+.custom-watts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.custom-watts label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.custom-watts input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(16, 10, 32, 0.85);
+  color: var(--text);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.95rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-watts input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.custom-watts input:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.55);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
 .device-quantity-pill {
   position: absolute;
   top: 8px;
@@ -441,14 +477,14 @@ tbody td {
 }
 
 .quantity-controls,
-.hour-controls {
+.time-value-controls {
   display: flex;
   align-items: center;
   gap: 0.35rem;
 }
 
 .quantity-controls button,
-.hour-controls button {
+.time-value-controls button {
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -462,13 +498,13 @@ tbody td {
 }
 
 .quantity-controls button:hover,
-.hour-controls button:hover {
+.time-value-controls button:hover {
   background: rgba(139, 92, 246, 0.35);
   transform: translateY(-1px);
 }
 
 .quantity-controls input,
-.hour-controls input {
+.time-value-controls input {
   width: 64px;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -477,6 +513,30 @@ tbody td {
   color: var(--text);
   font-size: 0.95rem;
   text-align: center;
+}
+
+.time-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.time-unit-select {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(16, 10, 32, 0.85);
+  color: var(--text);
+  padding: 0.4rem 0.65rem;
+  font-size: 0.9rem;
+  min-width: 70px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.time-unit-select:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
 .remove-button {
@@ -845,14 +905,14 @@ tbody td {
 
   .device-controls button,
   .quantity-controls button,
-  .hour-controls button {
+  .time-value-controls button {
     width: 28px;
     height: 28px;
   }
 
   .device-controls input,
   .quantity-controls input,
-  .hour-controls input {
+  .time-value-controls input {
     width: 52px;
   }
 
