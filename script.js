@@ -408,6 +408,8 @@ const alternativesSection = document.getElementById('alternatives-section');
 const alternativeListEl = document.getElementById('alternative-list');
 
 const cardRegistry = new Map();
+let previousTotalPower = 0;
+let previousTotalEnergy = 0;
 
 function showSelectedSection() {
   if (!selectedSection) {
@@ -418,9 +420,16 @@ function showSelectedSection() {
     return;
   }
 
-  selectedSection.classList.remove('hidden');
+  selectedSection.classList.remove('hidden', 'animating-out');
   requestAnimationFrame(() => {
-    selectedSection.classList.add('visible');
+    selectedSection.classList.add('visible', 'animating-in');
+    const handleAnimationEnd = (event) => {
+      if (event.target !== selectedSection) {
+        return;
+      }
+      selectedSection.classList.remove('animating-in');
+    };
+    selectedSection.addEventListener('animationend', handleAnimationEnd, { once: true });
   });
 }
 
@@ -434,16 +443,19 @@ function hideSelectedSection() {
     return;
   }
 
-  const handleTransitionEnd = (event) => {
+  selectedSection.classList.remove('animating-in');
+  selectedSection.classList.add('animating-out');
+  const handleAnimationEnd = (event) => {
     if (event.target !== selectedSection) {
       return;
     }
+    selectedSection.classList.remove('animating-out');
     if (!selectedSection.classList.contains('visible')) {
       selectedSection.classList.add('hidden');
     }
   };
 
-  selectedSection.addEventListener('transitionend', handleTransitionEnd, { once: true });
+  selectedSection.addEventListener('animationend', handleAnimationEnd, { once: true });
   selectedSection.classList.remove('visible');
 }
 
@@ -452,6 +464,42 @@ function formatNumber(value, digits = 0) {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits
   });
+}
+
+function animateMetric(element, from, to, suffix, decimals = 0, duration = 600) {
+  if (!element) {
+    return;
+  }
+
+  if (element._animationFrame) {
+    cancelAnimationFrame(element._animationFrame);
+  }
+
+  if (from === to) {
+    element._animationFrame = null;
+    element.textContent = `${formatNumber(to, decimals)} ${suffix}`;
+    return;
+  }
+
+  const startTime = performance.now();
+  const difference = to - from;
+
+  const step = (currentTime) => {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = from + difference * easedProgress;
+    element.textContent = `${formatNumber(currentValue, decimals)} ${suffix}`;
+
+    if (progress < 1) {
+      element._animationFrame = requestAnimationFrame(step);
+    } else {
+      element.textContent = `${formatNumber(to, decimals)} ${suffix}`;
+      element._animationFrame = null;
+    }
+  };
+
+  element._animationFrame = requestAnimationFrame(step);
 }
 
 function getVariant(device, variantId = device.variantId) {
@@ -730,8 +778,9 @@ function createVariantSelector(device) {
 function renderSelectedDevices(selectedDevices) {
   selectedTableBody.innerHTML = '';
 
-  selectedDevices.forEach((device) => {
+  selectedDevices.forEach((device, index) => {
     const row = document.createElement('tr');
+    row.style.setProperty('--row-delay', `${index * 60}ms`);
 
     const nameCell = document.createElement('td');
     nameCell.textContent = device.name;
@@ -757,8 +806,9 @@ function renderSelectedDevices(selectedDevices) {
     row.appendChild(hoursCell);
 
     const energyCell = document.createElement('td');
-    const energy = device.watts * device.quantity * device.hours;
-    energyCell.textContent = `${formatNumber(energy, energy % 1 === 0 ? 0 : 1)} Wh`;
+    const energy = Math.round(device.watts * device.quantity * device.hours * 10) / 10;
+    const energyDigits = Number.isInteger(energy) ? 0 : 1;
+    energyCell.textContent = `${formatNumber(energy, energyDigits)} Wh`;
     row.appendChild(energyCell);
 
     const removeCell = document.createElement('td');
@@ -925,8 +975,16 @@ function updateInterface() {
   }
   renderSelectedDevices(selectedDevices);
 
-  totalPowerEl.textContent = `${formatNumber(totalPower)} Вт`;
-  totalEnergyEl.textContent = `${formatNumber(totalEnergy)} Wh`;
+  totalPower = Math.round(totalPower);
+  totalEnergy = Math.round(totalEnergy * 10) / 10;
+
+  const energyDigits = Number.isInteger(totalEnergy) ? 0 : 1;
+
+  animateMetric(totalPowerEl, previousTotalPower, totalPower, 'Вт', 0);
+  animateMetric(totalEnergyEl, previousTotalEnergy, totalEnergy, 'Wh', energyDigits);
+
+  previousTotalPower = totalPower;
+  previousTotalEnergy = totalEnergy;
 
   const recommendation = getRecommendation(totalPower, totalEnergy);
   renderRecommendation(recommendation, totalPower, totalEnergy);

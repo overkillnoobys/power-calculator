@@ -340,19 +340,55 @@ h1 {
   border: 1px solid var(--border);
   backdrop-filter: blur(12px);
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(16px) scale(0.98);
   pointer-events: none;
-  transition: opacity 0.32s ease, transform 0.32s ease;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  will-change: opacity, transform;
 }
 
 .selected-devices.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   pointer-events: auto;
 }
 
 .selected-devices.hidden {
   display: none;
+}
+
+.selected-devices.animating-in {
+  animation: selectedPanelIn 0.42s cubic-bezier(0.22, 0.68, 0, 1) forwards;
+}
+
+.selected-devices.animating-out {
+  animation: selectedPanelOut 0.3s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes selectedPanelIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes selectedPanelOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
 }
 
 .table-wrapper {
@@ -364,6 +400,24 @@ table {
   width: 100%;
   border-collapse: collapse;
   min-width: 640px;
+}
+
+.selected-devices tbody tr {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: selectedRowIn 0.36s ease forwards;
+  animation-delay: var(--row-delay, 0ms);
+}
+
+@keyframes selectedRowIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 thead {
@@ -464,6 +518,7 @@ tbody td {
   margin: 0.65rem 0;
   font-size: 2rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-helper {
