@@ -2,16 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface Device {
   id: number;
@@ -139,8 +129,8 @@ const categories = [
   "Інструменти",
 ];
 
-const MotionButton = motion(Button);
-const MotionCard = motion(Card);
+const MotionButton = motion("button");
+const MotionCard = motion("div");
 
 export default function PowerCalculator() {
   const [devices, setDevices] = useState(initialDevices);
@@ -344,65 +334,69 @@ export default function PowerCalculator() {
                           <td className="p-3 text-white font-medium">{device.name}</td>
                           <td className="p-3">
                             {device.name === "Комп’ютер" ? (
-                              <Select
-                                onValueChange={(value) => {
+                              <select
+                                defaultValue=""
+                                onChange={(event) => {
+                                  const value = event.target.value;
                                   let watts = 150;
                                   if (value === "office") watts = 100;
                                   if (value === "gaming") watts = 300;
                                   if (value === "workstation") watts = 500;
                                   updateDevice(device.id, "watts", watts);
                                 }}
+                                className="bg-[#160a25] border border-[#8b5cf6]/40 text-white w-48 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c4b5fd]/60"
                               >
-                                <SelectTrigger className="bg-[#160a25] border border-[#8b5cf6]/40 text-white w-48 focus:ring-2 focus:ring-[#c4b5fd]/50">
-                                  <SelectValue placeholder="Тип комп’ютера" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-[#140821] text-white border border-[#8b5cf6]/40">
-                                  <SelectItem value="office">Офісний ПК (100 Вт)</SelectItem>
-                                  <SelectItem value="gaming">Ігровий ПК (300 Вт)</SelectItem>
-                                  <SelectItem value="workstation">Робоча станція (500 Вт)</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                <option value="" disabled>
+                                  Тип комп’ютера
+                                </option>
+                                <option value="office">Офісний ПК (100 Вт)</option>
+                                <option value="gaming">Ігровий ПК (300 Вт)</option>
+                                <option value="workstation">Робоча станція (500 Вт)</option>
+                              </select>
                             ) : device.name === "Монітор" ? (
-                              <Select
-                                onValueChange={(value) => {
+                              <select
+                                defaultValue=""
+                                onChange={(event) => {
+                                  const value = event.target.value;
                                   let watts = 50;
                                   if (value === "small") watts = 40;
                                   if (value === "large") watts = 70;
                                   if (value === "pro") watts = 100;
                                   updateDevice(device.id, "watts", watts);
                                 }}
+                                className="bg-[#160a25] border border-[#8b5cf6]/40 text-white w-48 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c4b5fd]/60"
                               >
-                                <SelectTrigger className="bg-[#160a25] border border-[#8b5cf6]/40 text-white w-48 focus:ring-2 focus:ring-[#c4b5fd]/50">
-                                  <SelectValue placeholder="Тип монітора" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-[#140821] text-white border border-[#8b5cf6]/40">
-                                  <SelectItem value="small">Монітор до 27″ (40 Вт)</SelectItem>
-                                  <SelectItem value="large">Монітор від 27″ (70 Вт)</SelectItem>
-                                  <SelectItem value="pro">Ігровий або професійний (100 Вт)</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                <option value="" disabled>
+                                  Тип монітора
+                                </option>
+                                <option value="small">Монітор до 27″ (40 Вт)</option>
+                                <option value="large">Монітор від 27″ (70 Вт)</option>
+                                <option value="pro">Ігровий або професійний (100 Вт)</option>
+                              </select>
                             ) : (
                               <div className="flex items-center justify-center gap-1">
                                 <MotionButton
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => handleIncrement(device.id, "watts", -10)}
-                                  className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white active:scale-90"
+                                  className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white rounded-lg transition-colors"
+                                  type="button"
                                 >
                                   –
                                 </MotionButton>
-                                <Input
+                                <input
                                   type="number"
                                   step={10}
                                   value={device.watts}
                                   onChange={(event) =>
                                     updateDevice(device.id, "watts", Number(event.target.value))
                                   }
-                                  className="text-center w-20 border border-[#8b5cf6]/40 bg-[#140821] text-white focus-visible:ring-1 focus-visible:ring-[#c4b5fd]"
+                                  className="text-center w-20 border border-[#8b5cf6]/40 bg-[#140821] text-white focus-visible:ring-1 focus-visible:ring-[#c4b5fd] rounded-lg py-1"
                                 />
                                 <MotionButton
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => handleIncrement(device.id, "watts", 10)}
-                                  className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white active:scale-90"
+                                  className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white rounded-lg transition-colors"
+                                  type="button"
                                 >
                                   +
                                 </MotionButton>
@@ -420,11 +414,12 @@ export default function PowerCalculator() {
                                     device.time.unit === "hours" ? -1 : -5
                                   )
                                 }
-                                className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white active:scale-90"
+                                className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white rounded-lg transition-colors"
+                                type="button"
                               >
                                 –
                               </MotionButton>
-                              <Input
+                              <input
                                 type="number"
                                 step={device.time.unit === "hours" ? 1 : 5}
                                 value={device.time.value}
@@ -433,7 +428,7 @@ export default function PowerCalculator() {
                                     value: Number(event.target.value),
                                   })
                                 }
-                                className="text-center w-20 border border-[#8b5cf6]/40 bg-[#140821] text-white focus-visible:ring-1 focus-visible:ring-[#c4b5fd]"
+                                className="text-center w-20 border border-[#8b5cf6]/40 bg-[#140821] text-white focus-visible:ring-1 focus-visible:ring-[#c4b5fd] rounded-lg py-1"
                               />
                               <MotionButton
                                 whileTap={{ scale: 0.9 }}
@@ -444,38 +439,35 @@ export default function PowerCalculator() {
                                     device.time.unit === "hours" ? 1 : 5
                                   )
                                 }
-                                className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white active:scale-90"
+                                className="h-8 w-8 bg-transparent text-[#c4b5fd] hover:bg-[#2f1b4a] hover:text-white rounded-lg transition-colors"
+                                type="button"
                               >
                                 +
                               </MotionButton>
                             </div>
                           </td>
                           <td className="p-3">
-                            <Select
+                            <select
                               value={device.time.unit}
-                              onValueChange={(value) =>
+                              onChange={(event) =>
                                 updateDevice(device.id, "time", {
-                                  unit: value as Device["time"]["unit"],
+                                  unit: event.target.value as Device["time"]["unit"],
                                 })
                               }
+                              className="bg-[#160a25] border border-[#8b5cf6]/40 text-white w-24 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c4b5fd]/60"
                             >
-                              <SelectTrigger className="bg-[#160a25] border border-[#8b5cf6]/40 text-white w-24 focus:ring-2 focus:ring-[#c4b5fd]/50">
-                                <SelectValue placeholder="год" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-[#140821] text-white border border-[#8b5cf6]/40">
-                                <SelectItem value="hours">год</SelectItem>
-                                <SelectItem value="minutes">хв</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              <option value="hours">год</option>
+                              <option value="minutes">хв</option>
+                            </select>
                           </td>
                           <td className="p-3 text-[#c4b5fd] font-semibold">{energy} Wh</td>
                           <td className="p-3 text-right">
                             <MotionButton
                               whileTap={{ scale: 0.85 }}
-                              variant="ghost"
-                              size="icon"
                               onClick={() => toggleDevice(device.id)}
-                              className="rounded-full w-8 h-8 text-red-400 hover:text-red-200 hover:bg-red-500/10"
+                              className="rounded-full w-8 h-8 text-red-400 hover:text-red-200 hover:bg-red-500/10 transition-colors"
+                              type="button"
+                              aria-label="Видалити пристрій"
                             >
                               ✕
                             </MotionButton>
@@ -494,24 +486,24 @@ export default function PowerCalculator() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-[#1a0d2b]/80 border border-[#8b5cf6]/40 shadow-[0_20px_50px_rgba(76,29,149,0.25)]"
+            className="bg-[#1a0d2b]/80 border border-[#8b5cf6]/40 shadow-[0_20px_50px_rgba(76,29,149,0.25)] rounded-2xl"
           >
-            <CardContent className="p-6">
+            <div className="p-6">
               <h3 className="text-lg text-gray-300 mb-1">Загальне споживання</h3>
               <p className="text-4xl font-bold text-[#c4b5fd] tracking-tight">{total} Wh</p>
               <p className="text-xs text-gray-400 mt-2">
                 Враховано ККД інвертора (≈90%) та рекомендований запас ємності (15%).
               </p>
-            </CardContent>
+            </div>
           </MotionCard>
 
           <MotionCard
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1a0d2b]/80 border border-[#8b5cf6]/40 shadow-[0_20px_50px_rgba(76,29,149,0.25)]"
+            className="bg-[#1a0d2b]/80 border border-[#8b5cf6]/40 shadow-[0_20px_50px_rgba(76,29,149,0.25)] rounded-2xl"
           >
-            <CardContent className="p-6">
+            <div className="p-6">
               <h3 className="text-lg text-gray-300 mb-3">Рекомендовані станції</h3>
               <div className="space-y-4">
                 {matchingStations.map((station) => (
@@ -534,29 +526,30 @@ export default function PowerCalculator() {
                   </div>
                 ))}
               </div>
-            </CardContent>
+            </div>
           </MotionCard>
 
           <MotionCard
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-[#6d28d9]/80 via-[#7c3aed]/80 to-[#a855f7]/80 border border-[#c4b5fd]/60 text-white shadow-[0_25px_60px_rgba(124,58,237,0.45)]"
+            className="bg-gradient-to-br from-[#6d28d9]/80 via-[#7c3aed]/80 to-[#a855f7]/80 border border-[#c4b5fd]/60 text-white shadow-[0_25px_60px_rgba(124,58,237,0.45)] rounded-2xl"
           >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-white text-lg">Готові зробити вибір?</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 flex flex-col gap-3">
+            <div className="pb-2 px-6 pt-6">
+              <h3 className="text-white text-lg font-semibold">Готові зробити вибір?</h3>
+            </div>
+            <div className="pt-0 px-6 pb-6 flex flex-col gap-3">
               <MotionButton
                 whileTap={{ scale: 0.94 }}
-                className="bg-white text-[#6d28d9] hover:bg-[#f5f3ff] font-semibold py-2 rounded-lg shadow-lg shadow-purple-900/40"
+                className="bg-white text-[#6d28d9] hover:bg-[#f5f3ff] font-semibold py-2 rounded-lg shadow-lg shadow-purple-900/40 transition-colors"
+                type="button"
               >
                 Підібрати станцію
               </MotionButton>
               <MotionButton
                 whileTap={{ scale: 0.94 }}
-                variant="outline"
-                className="border-white/70 text-white hover:bg-white/10 font-semibold py-2 rounded-lg"
+                className="border border-white/70 text-white hover:bg-white/10 font-semibold py-2 rounded-lg transition-colors"
+                type="button"
               >
                 Консультація з експертом
               </MotionButton>
@@ -564,7 +557,7 @@ export default function PowerCalculator() {
                 Наш спеціаліст допоможе врахувати підключення сонячних панелей, особливості
                 запуску техніки та підкаже найкращі сценарії використання.
               </p>
-            </CardContent>
+            </div>
           </MotionCard>
         </div>
 
