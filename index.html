@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор зарядних станцій</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="background-glow" aria-hidden="true"></div>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Енергоефективність</p>
+          <h1>Калькулятор потужності зарядної станції</h1>
+          <p class="lead">
+            Оберіть техніку та кількість пристроїв, які плануєте підключати. Ми розрахуємо загальне споживання та
+            запропонуємо найкращу зарядну станцію для ваших потреб.
+          </p>
+        </div>
+      </header>
+
+      <section class="device-categories" id="device-categories" aria-label="Категорії пристроїв"></section>
+
+      <section class="selected-devices hidden" id="selected-section">
+        <div class="section-heading">
+          <h2>Вибрані пристрої</h2>
+          <p>Налаштуйте кількість та орієнтовний час роботи для точного розрахунку споживання.</p>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Пристрій</th>
+                <th>Кількість</th>
+                <th>Потужність, Вт</th>
+                <th>Час роботи, год</th>
+                <th>Споживання, Wh</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="selected-devices"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="summary" aria-label="Підсумок">
+        <article class="summary-card">
+          <h3>Загальна потужність</h3>
+          <p class="summary-value" id="total-power">0 Вт</p>
+          <p class="summary-helper">Сумарна потужність усіх вибраних пристроїв.</p>
+        </article>
+        <article class="summary-card">
+          <h3>Орієнтовне споживання</h3>
+          <p class="summary-value" id="total-energy">0 Wh</p>
+          <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
+        </article>
+        <article class="summary-card recommendation" id="recommendation-card">
+          <div class="recommendation-header">
+            <h3>Рекомендована станція</h3>
+            <span id="match-label" class="match-label">Очікування даних…</span>
+          </div>
+          <div class="recommendation-body">
+            <p class="recommendation-title" id="station-name">Оберіть пристрої для рекомендації</p>
+            <dl class="recommendation-specs" id="station-specs"></dl>
+            <a class="buy-button disabled" id="station-link" href="#" target="_blank" rel="noopener">
+              Купити станцію
+            </a>
+          </div>
+        </article>
+      </section>
+
+      <section class="alternatives" id="alternatives-section">
+        <div class="section-heading">
+          <h2>Доступні варіанти</h2>
+          <p>Нижче наведені зарядні станції, що також можуть підійти під ваші потреби.</p>
+        </div>
+        <div class="alternative-grid" id="alternative-list"></div>
+      </section>
+
+      <footer class="app-footer">
+        <p>
+          * Результати є орієнтовними та можуть відрізнятися залежно від фактичного споживання вашої техніки. Для точного
+          підбору зверніться до фахівців.
+        </p>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
