@@ -1,0 +1,994 @@
+const devices = [
+  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3, icon: 'lamp' },
+  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10, icon: 'router' },
+  { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2, icon: 'smartphone' },
+  { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4, icon: 'laptop' },
+  {
+    id: 5,
+    category: 'Електроніка',
+    name: 'Монітор',
+    watts: 50,
+    hours: 4,
+    icon: 'monitor',
+    variants: [
+      { id: 'monitor-small', label: 'До 27″ — 50 Вт', watts: 50 },
+      { id: 'monitor-large', label: 'Від 27″ — 70 Вт', watts: 70 },
+      { id: 'monitor-pro', label: 'Ігровий / професійний — 100 Вт', watts: 100 }
+    ]
+  },
+  {
+    id: 6,
+    category: 'Електроніка',
+    name: 'Комп’ютер',
+    watts: 150,
+    hours: 4,
+    icon: 'desktop',
+    variants: [
+      { id: 'pc-office', label: 'Офісний — 150 Вт', watts: 150 },
+      { id: 'pc-gaming', label: 'Ігровий — 500 Вт', watts: 500 },
+      { id: 'pc-workstation', label: 'Робоча станція — 750 Вт', watts: 750 }
+    ]
+  },
+  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3, icon: 'television' },
+  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5, icon: 'satellite' },
+  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2, icon: 'gamepad' },
+  { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12, icon: 'fridge' },
+  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1, icon: 'washer' },
+  { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1, icon: 'dryer' },
+  { id: 23, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 4, icon: 'air-conditioner' },
+  { id: 24, category: 'Велика побутова техніка', name: 'Електроплита', watts: 1200, hours: 1, icon: 'stove' },
+  { id: 30, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3, icon: 'coffee-maker' },
+  { id: 31, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3, icon: 'microwave' },
+  { id: 32, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2, icon: 'kettle' },
+  { id: 33, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3, icon: 'hairdryer' },
+  { id: 40, category: 'Інструменти', name: 'Шуруповерт', watts: 500, hours: 1, icon: 'screwdriver' },
+  { id: 41, category: 'Інструменти', name: 'Дриль', watts: 800, hours: 0.5, icon: 'drill' },
+  { id: 42, category: 'Інструменти', name: 'Зварювальний апарат', watts: 1500, hours: 1, icon: 'welder' },
+  { id: 43, category: 'Інструменти', name: 'Компресор', watts: 1200, hours: 1, icon: 'compressor' }
+];
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+const iconDefinitions = {
+  lamp: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'circle', attrs: { cx: '12', cy: '8.5', r: '4.5', fill: 'none', 'stroke-width': '1.6' } },
+      { tag: 'line', attrs: { x1: '12', y1: '13', x2: '12', y2: '16', 'stroke-width': '1.6' } },
+      { tag: 'line', attrs: { x1: '9.5', y1: '16', x2: '14.5', y2: '16', 'stroke-width': '1.6' } },
+      { tag: 'line', attrs: { x1: '10.75', y1: '18', x2: '13.25', y2: '18', 'stroke-width': '1.6' } }
+    ]
+  },
+  router: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4.5', y: '13', width: '15', height: '6', rx: '1.7' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '16', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '16', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '16', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'line', attrs: { x1: '8', y1: '6', x2: '8', y2: '12' } },
+      { tag: 'line', attrs: { x1: '16', y1: '6', x2: '16', y2: '12' } },
+      { tag: 'path', attrs: { d: 'M6 10c1.8-2 4.2-3.1 6-3.1s4.2 1.1 6 3.1', fill: 'none' } }
+    ]
+  },
+  smartphone: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '8', y: '3', width: '8', height: '18', rx: '2' } },
+      { tag: 'line', attrs: { x1: '10', y1: '6', x2: '14', y2: '6' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '18', r: '0.9', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  laptop: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '5', width: '14', height: '9', rx: '1.2' } },
+      { tag: 'path', attrs: { d: 'M4 16h16l-1.5 3H5.5L4 16Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '9', y1: '18.5', x2: '15', y2: '18.5' } }
+    ]
+  },
+  monitor: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4', y: '4', width: '16', height: '11', rx: '1.6' } },
+      { tag: 'line', attrs: { x1: '12', y1: '15', x2: '12', y2: '19' } },
+      { tag: 'line', attrs: { x1: '9', y1: '19', x2: '15', y2: '19' } }
+    ]
+  },
+  desktop: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '7', y: '3.5', width: '10', height: '17', rx: '1.7' } },
+      { tag: 'line', attrs: { x1: '7', y1: '11.5', x2: '17', y2: '11.5' } },
+      { tag: 'circle', attrs: { cx: '14.5', cy: '6.8', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'rect', attrs: { x: '9', y: '14.5', width: '6', height: '3', rx: '0.8', fill: 'none' } }
+    ]
+  },
+  television: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '3.5', y: '5', width: '17', height: '11', rx: '1.6' } },
+      { tag: 'line', attrs: { x1: '8', y1: '18', x2: '10', y2: '20' } },
+      { tag: 'line', attrs: { x1: '16', y1: '18', x2: '14', y2: '20' } },
+      { tag: 'line', attrs: { x1: '9', y1: '20', x2: '15', y2: '20' } }
+    ]
+  },
+  satellite: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M6 14c0-4.4 3.6-8 8-8 .74 0 1.45.1 2.14.28L12 10l4 4 3.72-4.14c.18.69.28 1.4.28 2.14 0 4.4-3.6 8-8 8', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '6', y1: '18.5', x2: '10.5', y2: '14' } },
+      { tag: 'line', attrs: { x1: '17', y1: '3', x2: '21', y2: '7' } },
+      { tag: 'line', attrs: { x1: '15.5', y1: '4.5', x2: '19.5', y2: '8.5' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '10', r: '1.1', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  gamepad: {
+    viewBox: '0 0 24 24',
+    elements: [
+      {
+        tag: 'path',
+        attrs: {
+          d: 'M7 9.5h10c1.38 0 2.5 1.12 2.5 2.5v2.6c0 .86-.83 1.48-1.66 1.27l-2.22-.56a1.8 1.8 0 0 0-1.72.48l-.9.9a1.5 1.5 0 0 1-2.12 0l-.9-.9a1.8 1.8 0 0 0-1.72-.48l-2.22.56C5.33 15.58 4.5 14.96 4.5 14.1V12c0-1.38 1.12-2.5 2.5-2.5Z',
+          fill: 'none'
+        }
+      },
+      { tag: 'line', attrs: { x1: '8.8', y1: '12', x2: '11.2', y2: '12' } },
+      { tag: 'line', attrs: { x1: '10', y1: '10.8', x2: '10', y2: '13.2' } },
+      { tag: 'circle', attrs: { cx: '14.8', cy: '12.3', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '16.9', cy: '14', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  fridge: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '7', y: '3.5', width: '10', height: '17', rx: '1.7' } },
+      { tag: 'line', attrs: { x1: '7', y1: '11', x2: '17', y2: '11' } },
+      { tag: 'circle', attrs: { cx: '9.7', cy: '7.5', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '9.7', cy: '14.5', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  washer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '4', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9.5 11.5c1 .8 2.5.8 3.5 0s2.5-.8 3.5 0', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '11', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  dryer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '4', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9.5 13a2.5 2.5 0 0 0 3.5 0 2.5 2.5 0 0 1 3.5 0', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M8.5 10.8a3.8 3.8 0 0 1 6.7 0', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  'air-conditioner': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '3.5', y: '6', width: '17', height: '8.5', rx: '2' } },
+      { tag: 'line', attrs: { x1: '6', y1: '10.5', x2: '10', y2: '10.5' } },
+      { tag: 'line', attrs: { x1: '11.5', y1: '10.5', x2: '15.5', y2: '10.5' } },
+      { tag: 'path', attrs: { d: 'M8 14.5c0 1.8 1.2 3.2 3 3.7', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M13 14.5c0 1.8-1.2 3.2-3 3.7', fill: 'none' } }
+    ]
+  },
+  stove: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '8.5', r: '1.6', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '8.5', r: '1.6', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '13.5', r: '1.4', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '13.5', r: '1.4', fill: 'none' } }
+    ]
+  },
+  'coffee-maker': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M7 4h10v5a4 4 0 0 1-4 4h-2v3.5a2.5 2.5 0 0 0 5 0V15', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M7 4v12a3 3 0 0 0 3 3h1.2', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '14.5', cy: '7', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  microwave: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4', y: '6', width: '16', height: '12', rx: '1.8' } },
+      { tag: 'rect', attrs: { x: '7', y: '9', width: '8', height: '6', rx: '1', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '17', cy: '10.5', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '17', cy: '13.5', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  kettle: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M8 8a4 4 0 0 1 8 0v8a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4V9.5', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M16 9c1.2 0 2.5-.8 3-2l-2-1.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '9', y1: '5', x2: '15', y2: '5' } }
+    ]
+  },
+  hairdryer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5 10h9a4 4 0 0 0 4-4V5a2 2 0 0 0-2-2H9a4 4 0 0 0-4 4v3Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '5', y1: '10', x2: '5', y2: '13.5' } },
+      { tag: 'line', attrs: { x1: '5', y1: '13.5', x2: '7.5', y2: '17' } },
+      { tag: 'line', attrs: { x1: '17', y1: '6', x2: '20', y2: '6' } },
+      { tag: 'line', attrs: { x1: '17', y1: '8', x2: '19.5', y2: '8' } }
+    ]
+  },
+  screwdriver: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5.5 16.5 11 11l2 2-5.5 5.5a1.5 1.5 0 0 1-2.12 0l-.88-.88a1.5 1.5 0 0 1 0-2.12Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M12.5 9.5 15 7l2 2-2.5 2.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '16', y1: '5', x2: '18', y2: '3' } },
+      { tag: 'line', attrs: { x1: '18', y1: '3', x2: '19.5', y2: '4.5' } }
+    ]
+  },
+  drill: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M4 9h12a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-3v3l-2 1-1.5-1V15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '6', y1: '11', x2: '6', y2: '13' } },
+      { tag: 'line', attrs: { x1: '9', y1: '11', x2: '9', y2: '13' } },
+      { tag: 'line', attrs: { x1: '18', y1: '11', x2: '20', y2: '11' } }
+    ]
+  },
+  welder: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '6', y: '5', width: '12', height: '15', rx: '2' } },
+      { tag: 'rect', attrs: { x: '9', y: '9', width: '6', height: '5', rx: '1', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '5', x2: '12', y2: '3' } },
+      { tag: 'path', attrs: { d: 'M15.5 17.5 18 21', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9 17.5 6 21', fill: 'none' } }
+    ]
+  },
+  compressor: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '10', width: '14', height: '7', rx: '3.2' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '13.5', r: '1.5', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '13.5', r: '1.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '7', x2: '12', y2: '10' } },
+      { tag: 'rect', attrs: { x: '10', y: '5', width: '4', height: '2', rx: '0.8' } }
+    ]
+  },
+  generic: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M8 4h8l3 6v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V10Z', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '2', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '10', y1: '18', x2: '14', y2: '18' } }
+    ]
+  }
+};
+
+function createIconElement(key) {
+  const definition = iconDefinitions[key] || iconDefinitions.generic;
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', definition.viewBox);
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '1.5');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+
+  definition.elements.forEach(({ tag, attrs }) => {
+    const element = document.createElementNS(SVG_NS, tag);
+    Object.entries(attrs).forEach(([name, value]) => {
+      element.setAttribute(name, value);
+    });
+    svg.appendChild(element);
+  });
+
+  return svg;
+}
+
+const stations = [
+  {
+    name: 'Bluetti Apex 300',
+    model: 'Apex 300',
+    capacityWh: 2700,
+    powerW: 3800,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-bluetti-apex-300-2700wh-750000mah-3800w/'
+  },
+  {
+    name: 'Bluetti AC180',
+    model: 'AC180',
+    capacityWh: 1152,
+    powerW: 1800,
+    link: 'https://martin-shop.online/shop/zaryadnaya-stantsiya-bluetti-ac180-1152wh-320000mah-1800w/'
+  },
+  {
+    name: 'Bluetti AC50B',
+    model: 'AC50B',
+    capacityWh: 448,
+    powerW: 700,
+    link: 'https://martin-shop.online/shop/zaryadnaya-stantsiya-bluetti-ac50b-448wh-124444mah-700w/'
+  },
+  {
+    name: 'Bluetti EB3A',
+    model: 'EB3A',
+    capacityWh: 268,
+    powerW: 744,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-bluetti-eb3a-268wh-7444/'
+  },
+  {
+    name: 'PowerPlant G24',
+    model: 'G24',
+    capacityWh: 2048,
+    powerW: 2400,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-g24-2048wh-2400w/'
+  },
+  {
+    name: 'PowerPlant HS1800',
+    model: 'HS1800',
+    capacityWh: 1536,
+    powerW: 1800,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-hs1800-1536wh-426667mah1800w/'
+  },
+  {
+    name: 'PowerPlant HS1000',
+    model: 'HS1000',
+    capacityWh: 1024,
+    powerW: 1800,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-hs1000-1024wh-284444mah-1800w/'
+  },
+  {
+    name: 'PowerPlant HS800',
+    model: 'HS800',
+    capacityWh: 835.2,
+    powerW: 1000,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-hs800-835-2wh-232000mah-1000w/'
+  },
+  {
+    name: 'PowerPlant HS3600',
+    model: 'HS3600',
+    capacityWh: 3248,
+    powerW: 3600,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-hs3600-3248wh-902222mah-3600w/'
+  },
+  {
+    name: 'PowerPlant PP-425',
+    model: 'PP-425',
+    capacityWh: 148,
+    powerW: 200,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-pp-425-40000mah-pd-30w-ac-200w-dc12-16-8v-2xusb-c-2xusb-qc3-0/'
+  },
+  {
+    name: 'PowerPlant PP-286',
+    model: 'PP-286',
+    capacityWh: 88.8,
+    powerW: 120,
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-powerplant-pp-286-24000mah-pd-18w-ac-120w-dc12-16-8v-usb-c-2xusb-qc3-0wireless/'
+  }
+];
+
+const state = new Map(
+  devices.map((device) => {
+    const hasVariants = Array.isArray(device.variants) && device.variants.length > 0;
+    const initialVariant = hasVariants ? device.variants[0] : null;
+
+    return [
+      device.id,
+      {
+        ...device,
+        quantity: 0,
+        variantId: initialVariant ? initialVariant.id : null,
+        watts: initialVariant ? initialVariant.watts : device.watts
+      }
+    ];
+  })
+);
+
+const CONSULTATION_URL = 'https://martin-shop.online/contact/';
+
+const deviceCategoriesElement = document.getElementById('device-categories');
+const selectedSection = document.getElementById('selected-section');
+const selectedTableBody = document.getElementById('selected-devices');
+const totalPowerEl = document.getElementById('total-power');
+const totalEnergyEl = document.getElementById('total-energy');
+const recommendationCard = document.getElementById('recommendation-card');
+const matchLabel = document.getElementById('match-label');
+const stationNameEl = document.getElementById('station-name');
+const stationSpecsEl = document.getElementById('station-specs');
+const stationLinkEl = document.getElementById('station-link');
+const stationConsultEl = document.getElementById('station-consult');
+const alternativesSection = document.getElementById('alternatives-section');
+const alternativeListEl = document.getElementById('alternative-list');
+
+const cardRegistry = new Map();
+let previousTotalPower = 0;
+let previousTotalEnergy = 0;
+
+function showSelectedSection() {
+  if (!selectedSection) {
+    return;
+  }
+
+  if (selectedSection.classList.contains('visible')) {
+    return;
+  }
+
+  selectedSection.classList.remove('hidden', 'animating-out');
+  requestAnimationFrame(() => {
+    selectedSection.classList.add('visible', 'animating-in');
+    const handleAnimationEnd = (event) => {
+      if (event.target !== selectedSection) {
+        return;
+      }
+      selectedSection.classList.remove('animating-in');
+    };
+    selectedSection.addEventListener('animationend', handleAnimationEnd, { once: true });
+  });
+}
+
+function hideSelectedSection() {
+  if (!selectedSection) {
+    return;
+  }
+
+  if (!selectedSection.classList.contains('visible')) {
+    selectedSection.classList.add('hidden');
+    return;
+  }
+
+  selectedSection.classList.remove('animating-in');
+  selectedSection.classList.add('animating-out');
+  const handleAnimationEnd = (event) => {
+    if (event.target !== selectedSection) {
+      return;
+    }
+    selectedSection.classList.remove('animating-out');
+    if (!selectedSection.classList.contains('visible')) {
+      selectedSection.classList.add('hidden');
+    }
+  };
+
+  selectedSection.addEventListener('animationend', handleAnimationEnd, { once: true });
+  selectedSection.classList.remove('visible');
+}
+
+function formatNumber(value, digits = 0) {
+  return value.toLocaleString('uk-UA', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  });
+}
+
+function animateMetric(element, from, to, suffix, decimals = 0, duration = 600) {
+  if (!element) {
+    return;
+  }
+
+  if (element._animationFrame) {
+    cancelAnimationFrame(element._animationFrame);
+  }
+
+  if (from === to) {
+    element._animationFrame = null;
+    element.textContent = `${formatNumber(to, decimals)} ${suffix}`;
+    return;
+  }
+
+  const startTime = performance.now();
+  const difference = to - from;
+
+  const step = (currentTime) => {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easedProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = from + difference * easedProgress;
+    element.textContent = `${formatNumber(currentValue, decimals)} ${suffix}`;
+
+    if (progress < 1) {
+      element._animationFrame = requestAnimationFrame(step);
+    } else {
+      element.textContent = `${formatNumber(to, decimals)} ${suffix}`;
+      element._animationFrame = null;
+    }
+  };
+
+  element._animationFrame = requestAnimationFrame(step);
+}
+
+function getVariant(device, variantId = device.variantId) {
+  if (!Array.isArray(device.variants)) {
+    return null;
+  }
+  return device.variants.find((variant) => variant.id === variantId) || device.variants[0] || null;
+}
+
+function getDeviceMetaText(device) {
+  const variant = getVariant(device);
+  const powerText = variant ? variant.label : `${formatNumber(device.watts)} Вт`;
+  const hoursText = typeof device.hours === 'number' ? `${formatNumber(device.hours, device.hours % 1 === 0 ? 0 : 1)} год` : '';
+  return hoursText ? `${powerText} • ${hoursText}` : powerText;
+}
+
+function setQuantity(id, quantity) {
+  const device = state.get(id);
+  if (!device) return;
+  device.quantity = Math.max(0, Math.min(99, Number(quantity) || 0));
+  updateInterface();
+}
+
+function adjustQuantity(id, delta) {
+  const device = state.get(id);
+  if (!device) return;
+  setQuantity(id, device.quantity + delta);
+}
+
+function setHours(id, hours) {
+  const device = state.get(id);
+  if (!device) return;
+  const nextValue = Number(hours);
+  if (!Number.isFinite(nextValue)) {
+    return;
+  }
+  const clamped = Math.max(0, Math.min(24, nextValue));
+  device.hours = Math.round(clamped * 10) / 10;
+  updateInterface();
+}
+
+function setVariant(id, variantId) {
+  const device = state.get(id);
+  if (!device || !Array.isArray(device.variants)) {
+    return;
+  }
+
+  const nextVariant = getVariant(device, variantId);
+  if (!nextVariant) {
+    return;
+  }
+
+  device.variantId = nextVariant.id;
+  device.watts = nextVariant.watts;
+  updateInterface();
+}
+
+function createCategorySection(category) {
+  const section = document.createElement('section');
+  section.className = 'category-block';
+
+  const title = document.createElement('h2');
+  title.textContent = category;
+  section.appendChild(title);
+
+  const description = document.createElement('p');
+  description.textContent = 'Оберіть потрібні пристрої та вкажіть їх кількість для розрахунку.';
+  section.appendChild(description);
+
+  const grid = document.createElement('div');
+  grid.className = 'device-grid';
+
+  const devicesInCategory = Array.from(state.values()).filter((device) => device.category === category);
+
+  devicesInCategory.forEach((device) => {
+    const card = document.createElement('article');
+    card.className = 'device-card';
+    card.dataset.deviceId = String(device.id);
+    card.setAttribute('aria-expanded', 'false');
+
+    const pill = document.createElement('span');
+    pill.className = 'device-quantity-pill';
+    pill.textContent = 'x0';
+    card.appendChild(pill);
+
+    const header = document.createElement('div');
+    header.className = 'device-card-header';
+
+    const info = document.createElement('div');
+    info.className = 'device-card-info';
+
+    const icon = document.createElement('span');
+    icon.className = 'device-icon';
+    icon.appendChild(createIconElement(device.icon));
+    info.appendChild(icon);
+
+    const textBlock = document.createElement('div');
+    textBlock.className = 'device-card-text';
+
+    const title = document.createElement('h3');
+    title.textContent = device.name;
+    textBlock.appendChild(title);
+
+    const meta = document.createElement('p');
+    meta.className = 'device-meta';
+    meta.textContent = getDeviceMetaText(device);
+    textBlock.appendChild(meta);
+
+    info.appendChild(textBlock);
+    header.appendChild(info);
+
+    const addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'device-add';
+    addButton.textContent = '+';
+    addButton.setAttribute('aria-label', `Додати ${device.name}`);
+    addButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const current = state.get(device.id);
+      const nextQuantity = current && current.quantity > 0 ? current.quantity : 1;
+      setQuantity(device.id, nextQuantity);
+    });
+
+    header.appendChild(addButton);
+    card.appendChild(header);
+
+    const quickActions = document.createElement('div');
+    quickActions.className = 'device-quick-actions';
+
+    const controls = document.createElement('div');
+    controls.className = 'device-controls';
+
+    const minus = document.createElement('button');
+    minus.type = 'button';
+    minus.setAttribute('aria-label', `Зменшити кількість для ${device.name}`);
+    minus.textContent = '−';
+    minus.addEventListener('click', (event) => {
+      event.stopPropagation();
+      adjustQuantity(device.id, -1);
+    });
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.inputMode = 'numeric';
+    input.min = '0';
+    input.max = '99';
+    input.value = String(device.quantity);
+    input.addEventListener('input', (event) => {
+      event.stopPropagation();
+      const target = event.target;
+      setQuantity(device.id, target.value);
+    });
+    input.addEventListener('click', (event) => event.stopPropagation());
+
+    const plus = document.createElement('button');
+    plus.type = 'button';
+    plus.setAttribute('aria-label', `Збільшити кількість для ${device.name}`);
+    plus.textContent = '+';
+    plus.addEventListener('click', (event) => {
+      event.stopPropagation();
+      adjustQuantity(device.id, 1);
+    });
+
+    controls.append(minus, input, plus);
+    quickActions.append(controls);
+    card.appendChild(quickActions);
+
+    grid.appendChild(card);
+    cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton });
+  });
+
+  section.appendChild(grid);
+  return section;
+}
+
+function renderCategories() {
+  const categories = [...new Set(devices.map((device) => device.category))];
+  const fragment = document.createDocumentFragment();
+
+  categories.forEach((category) => {
+    fragment.appendChild(createCategorySection(category));
+  });
+
+  deviceCategoriesElement.appendChild(fragment);
+}
+
+function createQuantityControls(device) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'quantity-controls';
+
+  const minus = document.createElement('button');
+  minus.type = 'button';
+  minus.textContent = '−';
+  minus.addEventListener('click', () => adjustQuantity(device.id, -1));
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0';
+  input.max = '99';
+  input.value = String(device.quantity);
+  input.addEventListener('input', (event) => {
+    const target = event.target;
+    setQuantity(device.id, target.value);
+  });
+
+  const plus = document.createElement('button');
+  plus.type = 'button';
+  plus.textContent = '+';
+  plus.addEventListener('click', () => adjustQuantity(device.id, 1));
+
+  wrapper.append(minus, input, plus);
+  return { wrapper, input };
+}
+
+function createHourControls(device) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'hour-controls';
+
+  const minus = document.createElement('button');
+  minus.type = 'button';
+  minus.textContent = '−';
+  minus.addEventListener('click', () => setHours(device.id, device.hours - 0.5));
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.step = '0.1';
+  input.min = '0';
+  input.max = '24';
+  input.value = String(device.hours);
+  input.addEventListener('input', (event) => {
+    const target = event.target;
+    setHours(device.id, target.value);
+  });
+
+  const plus = document.createElement('button');
+  plus.type = 'button';
+  plus.textContent = '+';
+  plus.addEventListener('click', () => setHours(device.id, device.hours + 0.5));
+
+  wrapper.append(minus, input, plus);
+  return { wrapper, input };
+}
+
+function createVariantSelector(device) {
+  if (!Array.isArray(device.variants) || device.variants.length === 0) {
+    return null;
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'variant-selector';
+
+  const select = document.createElement('select');
+  select.className = 'variant-select';
+
+  device.variants.forEach((variant) => {
+    const option = document.createElement('option');
+    option.value = variant.id;
+    option.textContent = variant.label;
+    select.appendChild(option);
+  });
+
+  select.value = device.variantId || device.variants[0].id;
+  select.addEventListener('change', (event) => {
+    const target = event.target;
+    setVariant(device.id, target.value);
+  });
+
+  const currentPower = document.createElement('span');
+  currentPower.className = 'variant-power';
+  currentPower.textContent = `Поточна потужність: ${formatNumber(device.watts)} Вт`;
+
+  wrapper.append(select, currentPower);
+  return { wrapper, select, currentPower };
+}
+
+function renderSelectedDevices(selectedDevices) {
+  selectedTableBody.innerHTML = '';
+
+  selectedDevices.forEach((device, index) => {
+    const row = document.createElement('tr');
+    row.style.setProperty('--row-delay', `${index * 60}ms`);
+
+    const nameCell = document.createElement('td');
+    nameCell.textContent = device.name;
+    row.appendChild(nameCell);
+
+    const quantityCell = document.createElement('td');
+    const quantityControls = createQuantityControls(device);
+    quantityCell.appendChild(quantityControls.wrapper);
+    row.appendChild(quantityCell);
+
+    const powerCell = document.createElement('td');
+    const variantControls = createVariantSelector(device);
+    if (variantControls) {
+      powerCell.appendChild(variantControls.wrapper);
+    } else {
+      powerCell.textContent = `${formatNumber(device.watts)} Вт`;
+    }
+    row.appendChild(powerCell);
+
+    const hoursCell = document.createElement('td');
+    const hourControls = createHourControls(device);
+    hoursCell.appendChild(hourControls.wrapper);
+    row.appendChild(hoursCell);
+
+    const energyCell = document.createElement('td');
+    const energy = Math.round(device.watts * device.quantity * device.hours * 10) / 10;
+    const energyDigits = Number.isInteger(energy) ? 0 : 1;
+    energyCell.textContent = `${formatNumber(energy, energyDigits)} Wh`;
+    row.appendChild(energyCell);
+
+    const removeCell = document.createElement('td');
+    removeCell.style.textAlign = 'right';
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'remove-button';
+    removeButton.setAttribute('aria-label', `Видалити ${device.name}`);
+    removeButton.innerHTML = '&times;';
+    removeButton.addEventListener('click', () => setQuantity(device.id, 0));
+    removeCell.appendChild(removeButton);
+    row.appendChild(removeCell);
+
+    selectedTableBody.appendChild(row);
+  });
+}
+
+function getRecommendation(totalPower, totalEnergy) {
+  if (totalPower === 0 || totalEnergy === 0) {
+    return null;
+  }
+
+  const sortedStations = stations
+    .map((station) => ({ ...station }))
+    .sort((a, b) => a.capacityWh - b.capacityWh);
+
+  const matchingStations = sortedStations.filter((station) => station.capacityWh >= totalEnergy && station.powerW >= totalPower);
+
+  if (matchingStations.length > 0) {
+    return { station: matchingStations[0], alternatives: matchingStations.slice(1) };
+  }
+
+  const powerOnly = sortedStations.filter((station) => station.powerW >= totalPower);
+  if (powerOnly.length > 0) {
+    return { station: powerOnly[0], alternatives: powerOnly.slice(1) };
+  }
+
+  return { station: sortedStations[sortedStations.length - 1], alternatives: sortedStations.slice(0, -1) };
+}
+
+function renderRecommendation(recommendation, totalPower, totalEnergy) {
+  if (!recommendation) {
+    matchLabel.textContent = 'Очікування даних…';
+    matchLabel.classList.remove('warning');
+    stationNameEl.textContent = 'Оберіть пристрої для рекомендації';
+    stationSpecsEl.innerHTML = '';
+    stationLinkEl.classList.add('disabled');
+    stationLinkEl.href = '#';
+    stationConsultEl.classList.add('disabled');
+    stationConsultEl.href = CONSULTATION_URL;
+    alternativesSection.style.display = 'none';
+    return;
+  }
+
+  const { station, alternatives } = recommendation;
+
+  const energyMatch = station.capacityWh >= totalEnergy;
+  const powerMatch = station.powerW >= totalPower;
+
+  if (energyMatch && powerMatch) {
+    matchLabel.textContent = 'Повна сумісність';
+    matchLabel.classList.remove('warning');
+  } else {
+    matchLabel.textContent = 'Потрібна перевірка';
+    matchLabel.classList.add('warning');
+  }
+
+  stationNameEl.textContent = station.name;
+  stationSpecsEl.innerHTML = '';
+
+  const specs = [
+    { label: 'Модель', value: station.model },
+    { label: 'Ємність', value: `${formatNumber(station.capacityWh)} Wh` },
+    { label: 'Потужність', value: `${formatNumber(station.powerW)} W` }
+  ];
+
+  specs.forEach((item) => {
+    const dt = document.createElement('dt');
+    dt.textContent = item.label;
+    const dd = document.createElement('dd');
+    dd.textContent = item.value;
+    stationSpecsEl.append(dt, dd);
+  });
+
+  stationLinkEl.classList.remove('disabled');
+  stationLinkEl.href = station.link;
+  stationConsultEl.classList.remove('disabled');
+  stationConsultEl.href = CONSULTATION_URL;
+
+  renderAlternatives(alternatives, station);
+}
+
+function renderAlternatives(alternatives, selectedStation) {
+  alternativeListEl.innerHTML = '';
+
+  const otherStations = stations.filter((station) => station !== selectedStation);
+  const fallbackList = alternatives && alternatives.length > 0 ? alternatives : otherStations;
+
+  fallbackList.forEach((station) => {
+    const card = document.createElement('article');
+    card.className = 'alternative-card';
+
+    const title = document.createElement('h3');
+    title.textContent = station.name;
+    card.appendChild(title);
+
+    const specs = document.createElement('p');
+    specs.className = 'alternative-specs';
+    specs.textContent = `Ємність: ${formatNumber(station.capacityWh)} Wh • Потужність: ${formatNumber(station.powerW)} W`;
+    card.appendChild(specs);
+
+    const actions = document.createElement('div');
+    actions.className = 'alternative-actions';
+
+    const link = document.createElement('a');
+    link.href = station.link;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'Купити станцію';
+
+    const consult = document.createElement('a');
+    consult.href = CONSULTATION_URL;
+    consult.target = '_blank';
+    consult.rel = 'noopener';
+    consult.textContent = 'Потрібна консультація';
+
+    actions.append(link, consult);
+    card.appendChild(actions);
+    alternativeListEl.appendChild(card);
+  });
+
+  alternativesSection.style.display = fallbackList.length > 0 ? 'block' : 'none';
+}
+
+function updateInterface() {
+  const selectedDevices = [];
+  let totalPower = 0;
+  let totalEnergy = 0;
+
+  state.forEach((device) => {
+    if (device.quantity > 0) {
+      selectedDevices.push(device);
+      totalPower += device.watts * device.quantity;
+      totalEnergy += device.watts * device.quantity * device.hours;
+    }
+
+    const cardMeta = cardRegistry.get(device.id);
+    if (cardMeta) {
+      const isActive = device.quantity > 0;
+      cardMeta.card.classList.toggle('active', isActive);
+      cardMeta.card.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+      cardMeta.quantityPill.textContent = `x${device.quantity}`;
+      cardMeta.input.value = String(device.quantity);
+      cardMeta.meta.textContent = getDeviceMetaText(device);
+      cardMeta.addButton.textContent = isActive ? '✓' : '+';
+      cardMeta.addButton.setAttribute('aria-label', isActive ? `${device.name} додано` : `Додати ${device.name}`);
+    }
+  });
+
+  if (selectedDevices.length > 0) {
+    showSelectedSection();
+  } else {
+    hideSelectedSection();
+  }
+  renderSelectedDevices(selectedDevices);
+
+  totalPower = Math.round(totalPower);
+  totalEnergy = Math.round(totalEnergy * 10) / 10;
+
+  const energyDigits = Number.isInteger(totalEnergy) ? 0 : 1;
+
+  animateMetric(totalPowerEl, previousTotalPower, totalPower, 'Вт', 0);
+  animateMetric(totalEnergyEl, previousTotalEnergy, totalEnergy, 'Wh', energyDigits);
+
+  previousTotalPower = totalPower;
+  previousTotalEnergy = totalEnergy;
+
+  const recommendation = getRecommendation(totalPower, totalEnergy);
+  renderRecommendation(recommendation, totalPower, totalEnergy);
+}
+
+renderCategories();
+updateInterface();
