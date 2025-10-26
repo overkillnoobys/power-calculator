@@ -1,15 +1,15 @@
 const devices = [
-  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3, icon: '💡' },
-  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10, icon: '📡' },
-  { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2, icon: '📱' },
-  { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4, icon: '💻' },
+  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3, icon: 'lamp' },
+  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10, icon: 'router' },
+  { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2, icon: 'smartphone' },
+  { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4, icon: 'laptop' },
   {
     id: 5,
     category: 'Електроніка',
     name: 'Монітор',
     watts: 50,
     hours: 4,
-    icon: '🖥️',
+    icon: 'monitor',
     variants: [
       { id: 'monitor-small', label: 'До 27″ — 50 Вт', watts: 50 },
       { id: 'monitor-large', label: 'Від 27″ — 70 Вт', watts: 70 },
@@ -22,30 +22,277 @@ const devices = [
     name: 'Комп’ютер',
     watts: 150,
     hours: 4,
-    icon: '🖥️',
+    icon: 'desktop',
     variants: [
       { id: 'pc-office', label: 'Офісний — 150 Вт', watts: 150 },
       { id: 'pc-gaming', label: 'Ігровий — 500 Вт', watts: 500 },
       { id: 'pc-workstation', label: 'Робоча станція — 750 Вт', watts: 750 }
     ]
   },
-  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3, icon: '📺' },
-  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5, icon: '🛰️' },
-  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2, icon: '🎮' },
-  { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12, icon: '🧊' },
-  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1, icon: '🧺' },
-  { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1, icon: '🌬️' },
-  { id: 23, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 4, icon: '❄️' },
-  { id: 24, category: 'Велика побутова техніка', name: 'Електроплита', watts: 1200, hours: 1, icon: '🍳' },
-  { id: 30, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3, icon: '☕' },
-  { id: 31, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3, icon: '🍲' },
-  { id: 32, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2, icon: '🍵' },
-  { id: 33, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3, icon: '💨' },
-  { id: 40, category: 'Інструменти', name: 'Шуруповерт', watts: 500, hours: 1, icon: '🪛' },
-  { id: 41, category: 'Інструменти', name: 'Дриль', watts: 800, hours: 0.5, icon: '🛠️' },
-  { id: 42, category: 'Інструменти', name: 'Зварювальний апарат', watts: 1500, hours: 1, icon: '🔥' },
-  { id: 43, category: 'Інструменти', name: 'Компресор', watts: 1200, hours: 1, icon: '🔩' }
+  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3, icon: 'television' },
+  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5, icon: 'satellite' },
+  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2, icon: 'gamepad' },
+  { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12, icon: 'fridge' },
+  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1, icon: 'washer' },
+  { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1, icon: 'dryer' },
+  { id: 23, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 4, icon: 'air-conditioner' },
+  { id: 24, category: 'Велика побутова техніка', name: 'Електроплита', watts: 1200, hours: 1, icon: 'stove' },
+  { id: 30, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3, icon: 'coffee-maker' },
+  { id: 31, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3, icon: 'microwave' },
+  { id: 32, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2, icon: 'kettle' },
+  { id: 33, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3, icon: 'hairdryer' },
+  { id: 40, category: 'Інструменти', name: 'Шуруповерт', watts: 500, hours: 1, icon: 'screwdriver' },
+  { id: 41, category: 'Інструменти', name: 'Дриль', watts: 800, hours: 0.5, icon: 'drill' },
+  { id: 42, category: 'Інструменти', name: 'Зварювальний апарат', watts: 1500, hours: 1, icon: 'welder' },
+  { id: 43, category: 'Інструменти', name: 'Компресор', watts: 1200, hours: 1, icon: 'compressor' }
 ];
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+const iconDefinitions = {
+  lamp: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'circle', attrs: { cx: '12', cy: '8.5', r: '4.5', fill: 'none', 'stroke-width': '1.6' } },
+      { tag: 'line', attrs: { x1: '12', y1: '13', x2: '12', y2: '16', 'stroke-width': '1.6' } },
+      { tag: 'line', attrs: { x1: '9.5', y1: '16', x2: '14.5', y2: '16', 'stroke-width': '1.6' } },
+      { tag: 'line', attrs: { x1: '10.75', y1: '18', x2: '13.25', y2: '18', 'stroke-width': '1.6' } }
+    ]
+  },
+  router: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4.5', y: '13', width: '15', height: '6', rx: '1.7' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '16', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '16', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '16', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'line', attrs: { x1: '8', y1: '6', x2: '8', y2: '12' } },
+      { tag: 'line', attrs: { x1: '16', y1: '6', x2: '16', y2: '12' } },
+      { tag: 'path', attrs: { d: 'M6 10c1.8-2 4.2-3.1 6-3.1s4.2 1.1 6 3.1', fill: 'none' } }
+    ]
+  },
+  smartphone: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '8', y: '3', width: '8', height: '18', rx: '2' } },
+      { tag: 'line', attrs: { x1: '10', y1: '6', x2: '14', y2: '6' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '18', r: '0.9', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  laptop: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '5', width: '14', height: '9', rx: '1.2' } },
+      { tag: 'path', attrs: { d: 'M4 16h16l-1.5 3H5.5L4 16Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '9', y1: '18.5', x2: '15', y2: '18.5' } }
+    ]
+  },
+  monitor: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4', y: '4', width: '16', height: '11', rx: '1.6' } },
+      { tag: 'line', attrs: { x1: '12', y1: '15', x2: '12', y2: '19' } },
+      { tag: 'line', attrs: { x1: '9', y1: '19', x2: '15', y2: '19' } }
+    ]
+  },
+  desktop: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '7', y: '3.5', width: '10', height: '17', rx: '1.7' } },
+      { tag: 'line', attrs: { x1: '7', y1: '11.5', x2: '17', y2: '11.5' } },
+      { tag: 'circle', attrs: { cx: '14.5', cy: '6.8', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'rect', attrs: { x: '9', y: '14.5', width: '6', height: '3', rx: '0.8', fill: 'none' } }
+    ]
+  },
+  television: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '3.5', y: '5', width: '17', height: '11', rx: '1.6' } },
+      { tag: 'line', attrs: { x1: '8', y1: '18', x2: '10', y2: '20' } },
+      { tag: 'line', attrs: { x1: '16', y1: '18', x2: '14', y2: '20' } },
+      { tag: 'line', attrs: { x1: '9', y1: '20', x2: '15', y2: '20' } }
+    ]
+  },
+  satellite: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M6 14c0-4.4 3.6-8 8-8 .74 0 1.45.1 2.14.28L12 10l4 4 3.72-4.14c.18.69.28 1.4.28 2.14 0 4.4-3.6 8-8 8', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '6', y1: '18.5', x2: '10.5', y2: '14' } },
+      { tag: 'line', attrs: { x1: '17', y1: '3', x2: '21', y2: '7' } },
+      { tag: 'line', attrs: { x1: '15.5', y1: '4.5', x2: '19.5', y2: '8.5' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '10', r: '1.1', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  gamepad: {
+    viewBox: '0 0 24 24',
+    elements: [
+      {
+        tag: 'path',
+        attrs: {
+          d: 'M7 9.5h10c1.38 0 2.5 1.12 2.5 2.5v2.6c0 .86-.83 1.48-1.66 1.27l-2.22-.56a1.8 1.8 0 0 0-1.72.48l-.9.9a1.5 1.5 0 0 1-2.12 0l-.9-.9a1.8 1.8 0 0 0-1.72-.48l-2.22.56C5.33 15.58 4.5 14.96 4.5 14.1V12c0-1.38 1.12-2.5 2.5-2.5Z',
+          fill: 'none'
+        }
+      },
+      { tag: 'line', attrs: { x1: '8.8', y1: '12', x2: '11.2', y2: '12' } },
+      { tag: 'line', attrs: { x1: '10', y1: '10.8', x2: '10', y2: '13.2' } },
+      { tag: 'circle', attrs: { cx: '14.8', cy: '12.3', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '16.9', cy: '14', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  fridge: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '7', y: '3.5', width: '10', height: '17', rx: '1.7' } },
+      { tag: 'line', attrs: { x1: '7', y1: '11', x2: '17', y2: '11' } },
+      { tag: 'circle', attrs: { cx: '9.7', cy: '7.5', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '9.7', cy: '14.5', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  washer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '4', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9.5 11.5c1 .8 2.5.8 3.5 0s2.5-.8 3.5 0', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '11', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  dryer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '4', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9.5 13a2.5 2.5 0 0 0 3.5 0 2.5 2.5 0 0 1 3.5 0', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M8.5 10.8a3.8 3.8 0 0 1 6.7 0', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  'air-conditioner': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '3.5', y: '6', width: '17', height: '8.5', rx: '2' } },
+      { tag: 'line', attrs: { x1: '6', y1: '10.5', x2: '10', y2: '10.5' } },
+      { tag: 'line', attrs: { x1: '11.5', y1: '10.5', x2: '15.5', y2: '10.5' } },
+      { tag: 'path', attrs: { d: 'M8 14.5c0 1.8 1.2 3.2 3 3.7', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M13 14.5c0 1.8-1.2 3.2-3 3.7', fill: 'none' } }
+    ]
+  },
+  stove: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '8.5', r: '1.6', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '8.5', r: '1.6', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '13.5', r: '1.4', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '13.5', r: '1.4', fill: 'none' } }
+    ]
+  },
+  'coffee-maker': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M7 4h10v5a4 4 0 0 1-4 4h-2v3.5a2.5 2.5 0 0 0 5 0V15', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M7 4v12a3 3 0 0 0 3 3h1.2', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '14.5', cy: '7', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  microwave: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4', y: '6', width: '16', height: '12', rx: '1.8' } },
+      { tag: 'rect', attrs: { x: '7', y: '9', width: '8', height: '6', rx: '1', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '17', cy: '10.5', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '17', cy: '13.5', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  kettle: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M8 8a4 4 0 0 1 8 0v8a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4V9.5', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M16 9c1.2 0 2.5-.8 3-2l-2-1.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '9', y1: '5', x2: '15', y2: '5' } }
+    ]
+  },
+  hairdryer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5 10h9a4 4 0 0 0 4-4V5a2 2 0 0 0-2-2H9a4 4 0 0 0-4 4v3Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '5', y1: '10', x2: '5', y2: '13.5' } },
+      { tag: 'line', attrs: { x1: '5', y1: '13.5', x2: '7.5', y2: '17' } },
+      { tag: 'line', attrs: { x1: '17', y1: '6', x2: '20', y2: '6' } },
+      { tag: 'line', attrs: { x1: '17', y1: '8', x2: '19.5', y2: '8' } }
+    ]
+  },
+  screwdriver: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5.5 16.5 11 11l2 2-5.5 5.5a1.5 1.5 0 0 1-2.12 0l-.88-.88a1.5 1.5 0 0 1 0-2.12Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M12.5 9.5 15 7l2 2-2.5 2.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '16', y1: '5', x2: '18', y2: '3' } },
+      { tag: 'line', attrs: { x1: '18', y1: '3', x2: '19.5', y2: '4.5' } }
+    ]
+  },
+  drill: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M4 9h12a3 3 0 0 1 3 3v1a2 2 0 0 1-2 2h-3v3l-2 1-1.5-1V15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '6', y1: '11', x2: '6', y2: '13' } },
+      { tag: 'line', attrs: { x1: '9', y1: '11', x2: '9', y2: '13' } },
+      { tag: 'line', attrs: { x1: '18', y1: '11', x2: '20', y2: '11' } }
+    ]
+  },
+  welder: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '6', y: '5', width: '12', height: '15', rx: '2' } },
+      { tag: 'rect', attrs: { x: '9', y: '9', width: '6', height: '5', rx: '1', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '5', x2: '12', y2: '3' } },
+      { tag: 'path', attrs: { d: 'M15.5 17.5 18 21', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9 17.5 6 21', fill: 'none' } }
+    ]
+  },
+  compressor: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '10', width: '14', height: '7', rx: '3.2' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '13.5', r: '1.5', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '13.5', r: '1.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '7', x2: '12', y2: '10' } },
+      { tag: 'rect', attrs: { x: '10', y: '5', width: '4', height: '2', rx: '0.8' } }
+    ]
+  },
+  generic: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M8 4h8l3 6v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V10Z', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '2', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '10', y1: '18', x2: '14', y2: '18' } }
+    ]
+  }
+};
+
+function createIconElement(key) {
+  const definition = iconDefinitions[key] || iconDefinitions.generic;
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', definition.viewBox);
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '1.5');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+
+  definition.elements.forEach(({ tag, attrs }) => {
+    const element = document.createElementNS(SVG_NS, tag);
+    Object.entries(attrs).forEach(([name, value]) => {
+      element.setAttribute(name, value);
+    });
+    svg.appendChild(element);
+  });
+
+  return svg;
+}
 
 const stations = [
   {
@@ -251,23 +498,31 @@ function createCategorySection(category) {
     pill.textContent = 'x0';
     card.appendChild(pill);
 
+    const header = document.createElement('div');
+    header.className = 'device-card-header';
+
+    const info = document.createElement('div');
+    info.className = 'device-card-info';
+
     const icon = document.createElement('span');
     icon.className = 'device-icon';
-    icon.textContent = device.icon || '🔌';
-    icon.setAttribute('aria-hidden', 'true');
-    card.appendChild(icon);
+    icon.appendChild(createIconElement(device.icon));
+    info.appendChild(icon);
+
+    const textBlock = document.createElement('div');
+    textBlock.className = 'device-card-text';
 
     const title = document.createElement('h3');
     title.textContent = device.name;
-    card.appendChild(title);
+    textBlock.appendChild(title);
 
     const meta = document.createElement('p');
     meta.className = 'device-meta';
     meta.textContent = getDeviceMetaText(device);
-    card.appendChild(meta);
+    textBlock.appendChild(meta);
 
-    const quickActions = document.createElement('div');
-    quickActions.className = 'device-quick-actions';
+    info.appendChild(textBlock);
+    header.appendChild(info);
 
     const addButton = document.createElement('button');
     addButton.type = 'button';
@@ -280,6 +535,12 @@ function createCategorySection(category) {
       const nextQuantity = current && current.quantity > 0 ? current.quantity : 1;
       setQuantity(device.id, nextQuantity);
     });
+
+    header.appendChild(addButton);
+    card.appendChild(header);
+
+    const quickActions = document.createElement('div');
+    quickActions.className = 'device-quick-actions';
 
     const controls = document.createElement('div');
     controls.className = 'device-controls';
@@ -316,7 +577,7 @@ function createCategorySection(category) {
     });
 
     controls.append(minus, input, plus);
-    quickActions.append(addButton, controls);
+    quickActions.append(controls);
     card.appendChild(quickActions);
 
     card.addEventListener('click', () => {

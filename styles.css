@@ -94,23 +94,22 @@ h1 {
 
 .device-grid {
   display: grid;
-  gap: 0.85rem;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
 }
 
 .device-card {
   position: relative;
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 0.85rem 0.95rem 0.95rem;
+  padding: 0.75rem 0.85rem 0.85rem;
   background: linear-gradient(160deg, rgba(28, 15, 56, 0.75) 0%, rgba(22, 11, 42, 0.9) 100%);
   transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  display: grid;
-  gap: 0.6rem;
-  align-content: start;
-  justify-items: start;
-  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-height: 136px;
 }
 
 .device-card:hover {
@@ -124,26 +123,53 @@ h1 {
   box-shadow: 0 18px 40px rgba(139, 92, 246, 0.35);
 }
 
+.device-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.device-card-info {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.device-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
 .device-card h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.3;
 }
 
 .device-card .device-meta {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--muted);
 }
 
 .device-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
   display: grid;
   place-items: center;
-  background: rgba(139, 92, 246, 0.16);
-  font-size: 1.6rem;
-  color: var(--accent-strong);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.device-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .device-quick-actions {
@@ -151,14 +177,15 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  width: 100%;
 }
 
 .device-add {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
   font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -705,7 +732,7 @@ tbody td {
   }
 
   .device-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   table {
@@ -745,7 +772,7 @@ tbody td {
   }
 
   .device-card {
-    padding: 1rem 1.1rem;
+    padding: 0.85rem 0.95rem;
   }
 }
 
