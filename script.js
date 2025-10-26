@@ -1,14 +1,15 @@
 const devices = [
-  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3 },
-  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10 },
-  { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2 },
-  { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4 },
+  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3, icon: '💡' },
+  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10, icon: '📡' },
+  { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2, icon: '📱' },
+  { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4, icon: '💻' },
   {
     id: 5,
     category: 'Електроніка',
     name: 'Монітор',
     watts: 50,
     hours: 4,
+    icon: '🖥️',
     variants: [
       { id: 'monitor-small', label: 'До 27″ — 50 Вт', watts: 50 },
       { id: 'monitor-large', label: 'Від 27″ — 70 Вт', watts: 70 },
@@ -21,28 +22,29 @@ const devices = [
     name: 'Комп’ютер',
     watts: 150,
     hours: 4,
+    icon: '🖥️',
     variants: [
       { id: 'pc-office', label: 'Офісний — 150 Вт', watts: 150 },
       { id: 'pc-gaming', label: 'Ігровий — 500 Вт', watts: 500 },
       { id: 'pc-workstation', label: 'Робоча станція — 750 Вт', watts: 750 }
     ]
   },
-  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3 },
-  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5 },
-  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2 },
-  { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12 },
-  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1 },
-  { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1 },
-  { id: 23, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 4 },
-  { id: 24, category: 'Велика побутова техніка', name: 'Електроплита', watts: 1200, hours: 1 },
-  { id: 30, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3 },
-  { id: 31, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3 },
-  { id: 32, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2 },
-  { id: 33, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3 },
-  { id: 40, category: 'Інструменти', name: 'Шуруповерт', watts: 500, hours: 1 },
-  { id: 41, category: 'Інструменти', name: 'Дриль', watts: 800, hours: 0.5 },
-  { id: 42, category: 'Інструменти', name: 'Зварювальний апарат', watts: 1500, hours: 1 },
-  { id: 43, category: 'Інструменти', name: 'Компресор', watts: 1200, hours: 1 }
+  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3, icon: '📺' },
+  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5, icon: '🛰️' },
+  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2, icon: '🎮' },
+  { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12, icon: '🧊' },
+  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1, icon: '🧺' },
+  { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1, icon: '🌬️' },
+  { id: 23, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 4, icon: '❄️' },
+  { id: 24, category: 'Велика побутова техніка', name: 'Електроплита', watts: 1200, hours: 1, icon: '🍳' },
+  { id: 30, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3, icon: '☕' },
+  { id: 31, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3, icon: '🍲' },
+  { id: 32, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2, icon: '🍵' },
+  { id: 33, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3, icon: '💨' },
+  { id: 40, category: 'Інструменти', name: 'Шуруповерт', watts: 500, hours: 1, icon: '🪛' },
+  { id: 41, category: 'Інструменти', name: 'Дриль', watts: 800, hours: 0.5, icon: '🛠️' },
+  { id: 42, category: 'Інструменти', name: 'Зварювальний апарат', watts: 1500, hours: 1, icon: '🔥' },
+  { id: 43, category: 'Інструменти', name: 'Компресор', watts: 1200, hours: 1, icon: '🔩' }
 ];
 
 const stations = [
@@ -249,6 +251,12 @@ function createCategorySection(category) {
     pill.textContent = 'x0';
     card.appendChild(pill);
 
+    const icon = document.createElement('span');
+    icon.className = 'device-icon';
+    icon.textContent = device.icon || '🔌';
+    icon.setAttribute('aria-hidden', 'true');
+    card.appendChild(icon);
+
     const title = document.createElement('h3');
     title.textContent = device.name;
     card.appendChild(title);
@@ -264,7 +272,8 @@ function createCategorySection(category) {
     const addButton = document.createElement('button');
     addButton.type = 'button';
     addButton.className = 'device-add';
-    addButton.textContent = 'Додати';
+    addButton.textContent = '+';
+    addButton.setAttribute('aria-label', `Додати ${device.name}`);
     addButton.addEventListener('click', (event) => {
       event.stopPropagation();
       const current = state.get(device.id);
@@ -608,7 +617,11 @@ function updateInterface() {
       cardMeta.quantityPill.textContent = `x${device.quantity}`;
       cardMeta.input.value = String(device.quantity);
       cardMeta.meta.textContent = getDeviceMetaText(device);
-      cardMeta.addButton.textContent = device.quantity > 0 ? 'Обрано' : 'Додати';
+      cardMeta.addButton.textContent = device.quantity > 0 ? '✓' : '+';
+      cardMeta.addButton.setAttribute(
+        'aria-label',
+        device.quantity > 0 ? `${device.name} додано` : `Додати ${device.name}`
+      );
     }
   });
 

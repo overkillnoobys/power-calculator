@@ -94,18 +94,23 @@ h1 {
 
 .device-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
 .device-card {
   position: relative;
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem 0.95rem;
   background: linear-gradient(160deg, rgba(28, 15, 56, 0.75) 0%, rgba(22, 11, 42, 0.9) 100%);
   transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  justify-items: start;
+  min-height: 160px;
 }
 
 .device-card:hover {
@@ -120,39 +125,51 @@ h1 {
 }
 
 .device-card h3 {
-  margin: 0 0 0.4rem;
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
 }
 
 .device-card .device-meta {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: var(--muted);
 }
 
+.device-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(139, 92, 246, 0.16);
+  font-size: 1.6rem;
+  color: var(--accent-strong);
+}
+
 .device-quick-actions {
-  margin-top: 1rem;
+  margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .device-add {
-  width: 100%;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
-  padding: 0.6rem 0.75rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.4rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(139, 92, 246, 0.16);
+  background: rgba(139, 92, 246, 0.18);
   color: var(--accent-strong);
   border: 1px solid transparent;
   transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease;
 }
 
 .device-add:hover {
-  background: rgba(139, 92, 246, 0.28);
+  background: rgba(139, 92, 246, 0.3);
   transform: translateY(-1px);
 }
 
@@ -175,13 +192,13 @@ h1 {
 }
 
 .device-controls button {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   border: 1px solid transparent;
   background: rgba(139, 92, 246, 0.15);
   color: var(--accent-strong);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   display: grid;
   place-items: center;
   transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease;
@@ -197,7 +214,7 @@ h1 {
 }
 
 .device-controls input {
-  width: 48px;
+  width: 44px;
   text-align: center;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -240,8 +257,8 @@ h1 {
 
 .device-quantity-pill {
   position: absolute;
-  top: 12px;
-  right: 14px;
+  top: 10px;
+  right: 12px;
   border-radius: 999px;
   padding: 0.2rem 0.65rem;
   font-size: 0.75rem;
