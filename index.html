@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор зарядних станцій</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="background-glow" aria-hidden="true"></div>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Енергоефективність</p>
+          <h1>Калькулятор потужності зарядної станції</h1>
+          <p class="lead">
+            Оберіть техніку та кількість пристроїв, які плануєте підключати. Ми розрахуємо загальне споживання та
+            запропонуємо найкращу зарядну станцію для ваших потреб.
+          </p>
+        </div>
+      </header>
+
+      <section class="device-categories" id="device-categories" aria-label="Категорії пристроїв"></section>
+
+      <section class="tuning" id="tuning">
+        <div class="tuning-heading">
+          <h2>Налаштування сценарію</h2>
+          <p>
+            Керуйте втратами енергії та зберігайте власні конфігурації, щоб швидко повертатися до потрібних розрахунків.
+          </p>
+        </div>
+        <div class="tuning-grid">
+          <article class="tuning-card">
+            <header>
+              <h3>ККД інвертора</h3>
+              <span class="tuning-value" id="efficiency-output">90%</span>
+            </header>
+            <p>Оберіть ефективність перетворення змінного струму.</p>
+            <input type="range" id="efficiency-range" min="70" max="100" step="1" value="90" aria-label="ККД інвертора, %" />
+            <div class="tuning-presets" role="group" aria-label="Швидкі значення ККД">
+              <button type="button" data-eff-preset="85">85%</button>
+              <button type="button" data-eff-preset="90" class="active">90%</button>
+              <button type="button" data-eff-preset="95">95%</button>
+            </div>
+          </article>
+          <article class="tuning-card">
+            <header>
+              <h3>Резерв батареї (DoD)</h3>
+              <span class="tuning-value" id="reserve-output">85%</span>
+            </header>
+            <p>Оберіть допустиму глибину розрядження акумулятора.</p>
+            <input type="range" id="reserve-range" min="60" max="100" step="1" value="85" aria-label="Резерв батареї, %" />
+            <div class="tuning-presets" role="group" aria-label="Швидкі значення резерву">
+              <button type="button" data-reserve-preset="70">70%</button>
+              <button type="button" data-reserve-preset="80">80%</button>
+              <button type="button" data-reserve-preset="85" class="active">85%</button>
+            </div>
+          </article>
+        </div>
+        <div class="scenario-actions">
+          <button type="button" id="save-scenario" class="scenario-button">Зберегти локально</button>
+          <button type="button" id="reset-scenario" class="scenario-button subtle">Очистити</button>
+          <button type="button" id="export-scenario" class="scenario-button">Експорт JSON</button>
+          <button type="button" id="import-scenario" class="scenario-button">Імпорт JSON</button>
+          <button type="button" id="share-scenario" class="scenario-button highlight">Поділитися конфігурацією</button>
+          <input type="file" id="scenario-file" accept="application/json" hidden />
+        </div>
+        <p class="scenario-feedback" id="scenario-feedback" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="selected-devices hidden" id="selected-section">
+        <div class="section-heading">
+          <h2>Вибрані пристрої</h2>
+          <p>Налаштуйте кількість та орієнтовний час роботи для точного розрахунку споживання.</p>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Пристрій</th>
+                <th>Кількість</th>
+                <th>Потужність, Вт</th>
+                <th>Час роботи</th>
+                <th>Споживання, Wh</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="selected-devices"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="summary" aria-label="Підсумок">
+        <article class="summary-card">
+          <h3>Орієнтовне споживання</h3>
+          <p class="summary-value" id="total-energy">0 Wh</p>
+          <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
+        </article>
+        <article class="summary-card">
+          <h3>Споживання з урахуванням втрат</h3>
+          <p class="summary-value" id="total-buffered">0 Wh</p>
+          <p class="summary-helper" id="buffer-helper">
+            ККД: 90% · Резерв батареї: 85% · Запас енергії на випадок втрат та захисту акумулятора.
+          </p>
+        </article>
+        <article class="summary-card">
+          <h3>Максимальна потужність навантаження</h3>
+          <p class="summary-value" id="total-power">0 W</p>
+          <p class="summary-helper">Сумарна миттєва потужність усіх вибраних пристроїв.</p>
+        </article>
+        <article class="summary-card recommendation" id="recommendation-card">
+          <div class="recommendation-header">
+            <h3>Рекомендована станція</h3>
+            <span id="match-label" class="match-label">Очікування даних…</span>
+          </div>
+          <div class="recommendation-body">
+            <p class="recommendation-title" id="station-name">Оберіть пристрої для рекомендації</p>
+            <dl class="recommendation-specs" id="station-specs"></dl>
+            <div class="primary-actions">
+              <a class="buy-button disabled" id="station-link" href="#" target="_blank" rel="noopener">
+                Купити станцію
+              </a>
+              <a
+                class="consult-button disabled"
+                id="station-consult"
+                href="https://martin-shop.online/contact/"
+                target="_blank"
+                rel="noopener"
+              >
+                Потрібна консультація
+              </a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="alternatives" id="alternatives-section">
+        <div class="section-heading">
+          <h2>Доступні варіанти</h2>
+          <p>Нижче наведені зарядні станції, що також можуть підійти під ваші потреби.</p>
+        </div>
+        <div class="alternative-grid" id="alternative-list"></div>
+      </section>
+
+      <section class="breakdown" id="breakdown" aria-label="Розподіл споживання за категоріями">
+        <div class="section-heading">
+          <h2>Розподіл споживання</h2>
+          <p>Перегляньте, які категорії техніки формують найбільше навантаження.</p>
+        </div>
+        <div class="breakdown-grid" id="category-breakdown"></div>
+      </section>
+
+      <footer class="app-footer">
+        <p>
+          * Результати є орієнтовними та можуть відрізнятися залежно від фактичного споживання вашої техніки. Для точного
+          підбору зверніться до фахівців.
+        </p>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
