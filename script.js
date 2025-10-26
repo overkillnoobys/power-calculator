@@ -409,6 +409,44 @@ const alternativeListEl = document.getElementById('alternative-list');
 
 const cardRegistry = new Map();
 
+function showSelectedSection() {
+  if (!selectedSection) {
+    return;
+  }
+
+  if (selectedSection.classList.contains('visible')) {
+    return;
+  }
+
+  selectedSection.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    selectedSection.classList.add('visible');
+  });
+}
+
+function hideSelectedSection() {
+  if (!selectedSection) {
+    return;
+  }
+
+  if (!selectedSection.classList.contains('visible')) {
+    selectedSection.classList.add('hidden');
+    return;
+  }
+
+  const handleTransitionEnd = (event) => {
+    if (event.target !== selectedSection) {
+      return;
+    }
+    if (!selectedSection.classList.contains('visible')) {
+      selectedSection.classList.add('hidden');
+    }
+  };
+
+  selectedSection.addEventListener('transitionend', handleTransitionEnd, { once: true });
+  selectedSection.classList.remove('visible');
+}
+
 function formatNumber(value, digits = 0) {
   return value.toLocaleString('uk-UA', {
     minimumFractionDigits: digits,
@@ -492,6 +530,7 @@ function createCategorySection(category) {
     const card = document.createElement('article');
     card.className = 'device-card';
     card.dataset.deviceId = String(device.id);
+    card.setAttribute('aria-expanded', 'false');
 
     const pill = document.createElement('span');
     pill.className = 'device-quantity-pill';
@@ -579,12 +618,6 @@ function createCategorySection(category) {
     controls.append(minus, input, plus);
     quickActions.append(controls);
     card.appendChild(quickActions);
-
-    card.addEventListener('click', () => {
-      const current = state.get(device.id);
-      if (!current) return;
-      setQuantity(device.id, current.quantity === 0 ? 1 : 0);
-    });
 
     grid.appendChild(card);
     cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton });
@@ -874,19 +907,22 @@ function updateInterface() {
 
     const cardMeta = cardRegistry.get(device.id);
     if (cardMeta) {
-      cardMeta.card.classList.toggle('active', device.quantity > 0);
+      const isActive = device.quantity > 0;
+      cardMeta.card.classList.toggle('active', isActive);
+      cardMeta.card.setAttribute('aria-expanded', isActive ? 'true' : 'false');
       cardMeta.quantityPill.textContent = `x${device.quantity}`;
       cardMeta.input.value = String(device.quantity);
       cardMeta.meta.textContent = getDeviceMetaText(device);
-      cardMeta.addButton.textContent = device.quantity > 0 ? '✓' : '+';
-      cardMeta.addButton.setAttribute(
-        'aria-label',
-        device.quantity > 0 ? `${device.name} додано` : `Додати ${device.name}`
-      );
+      cardMeta.addButton.textContent = isActive ? '✓' : '+';
+      cardMeta.addButton.setAttribute('aria-label', isActive ? `${device.name} додано` : `Додати ${device.name}`);
     }
   });
 
-  selectedSection.classList.toggle('hidden', selectedDevices.length === 0);
+  if (selectedDevices.length > 0) {
+    showSelectedSection();
+  } else {
+    hideSelectedSection();
+  }
   renderSelectedDevices(selectedDevices);
 
   totalPowerEl.textContent = `${formatNumber(totalPower)} Вт`;

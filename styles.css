@@ -78,38 +78,40 @@ h1 {
 
 .device-categories {
   display: grid;
-  gap: 2.5rem;
-  margin-bottom: 2.5rem;
+  gap: 2.3rem;
+  margin-bottom: 2.3rem;
 }
 
 .category-block h2 {
-  font-size: 1.4rem;
-  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+  margin: 0 0 0.65rem;
 }
 
 .category-block p {
-  margin: 0 0 1.5rem;
+  margin: 0 0 1.35rem;
   color: var(--muted);
 }
 
 .device-grid {
   display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
 }
 
 .device-card {
   position: relative;
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 0.75rem 0.85rem 0.85rem;
-  background: linear-gradient(160deg, rgba(28, 15, 56, 0.75) 0%, rgba(22, 11, 42, 0.9) 100%);
-  transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
+  padding: 0.65rem 0.75rem;
+  background: linear-gradient(160deg, rgba(28, 15, 56, 0.75) 0%, rgba(22, 11, 42, 0.92) 100%);
+  transition: transform 0.24s ease, border 0.24s ease, box-shadow 0.24s ease, min-height 0.3s ease,
+    padding 0.3s ease;
+  cursor: default;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  min-height: 136px;
+  gap: 0.45rem;
+  min-height: 112px;
+  overflow: hidden;
 }
 
 .device-card:hover {
@@ -127,13 +129,13 @@ h1 {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.55rem;
   width: 100%;
 }
 
 .device-card-info {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.55rem;
   align-items: flex-start;
   flex: 1 1 auto;
   min-width: 0;
@@ -148,22 +150,22 @@ h1 {
 
 .device-card h3 {
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.3;
+  font-size: 0.9rem;
+  line-height: 1.28;
 }
 
 .device-card .device-meta {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   color: var(--muted);
 }
 
 .device-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   color: var(--text);
 }
 
@@ -174,18 +176,25 @@ h1 {
 
 .device-quick-actions {
   margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  width: 100%;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-top: 0;
+  transition: grid-template-rows 0.32s ease, opacity 0.32s ease, margin-top 0.32s ease;
+  pointer-events: none;
+}
+
+.device-quick-actions > * {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .device-add {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -208,14 +217,26 @@ h1 {
   display: none;
 }
 
+.device-card.active .device-quick-actions {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 0.45rem;
+  pointer-events: auto;
+}
+
 .device-controls {
-  display: none;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
+  padding-top: 0.15rem;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
 }
 
 .device-card.active .device-controls {
-  display: flex;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .device-controls button {
@@ -284,11 +305,11 @@ h1 {
 
 .device-quantity-pill {
   position: absolute;
-  top: 10px;
-  right: 12px;
+  top: 8px;
+  right: 10px;
   border-radius: 999px;
-  padding: 0.2rem 0.65rem;
-  font-size: 0.75rem;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
   background: rgba(139, 92, 246, 0.18);
   color: var(--accent-strong);
   font-weight: 600;
@@ -312,13 +333,22 @@ h1 {
 }
 
 .selected-devices {
-  margin-bottom: 2.5rem;
-  padding: 1.75rem;
+  margin-bottom: 2.3rem;
+  padding: 1.6rem;
   border-radius: 22px;
   background: var(--panel);
   border: 1px solid var(--border);
   backdrop-filter: blur(12px);
-  transition: opacity 0.25s ease;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+
+.selected-devices.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .selected-devices.hidden {
