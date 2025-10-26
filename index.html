@@ -28,6 +28,52 @@
 
       <section class="device-categories" id="device-categories" aria-label="Категорії пристроїв"></section>
 
+      <section class="tuning" id="tuning">
+        <div class="tuning-heading">
+          <h2>Налаштування сценарію</h2>
+          <p>
+            Керуйте втратами енергії та зберігайте власні конфігурації, щоб швидко повертатися до потрібних розрахунків.
+          </p>
+        </div>
+        <div class="tuning-grid">
+          <article class="tuning-card">
+            <header>
+              <h3>ККД інвертора</h3>
+              <span class="tuning-value" id="efficiency-output">90%</span>
+            </header>
+            <p>Оберіть ефективність перетворення змінного струму.</p>
+            <input type="range" id="efficiency-range" min="70" max="100" step="1" value="90" aria-label="ККД інвертора, %" />
+            <div class="tuning-presets" role="group" aria-label="Швидкі значення ККД">
+              <button type="button" data-eff-preset="85">85%</button>
+              <button type="button" data-eff-preset="90" class="active">90%</button>
+              <button type="button" data-eff-preset="95">95%</button>
+            </div>
+          </article>
+          <article class="tuning-card">
+            <header>
+              <h3>Резерв батареї (DoD)</h3>
+              <span class="tuning-value" id="reserve-output">85%</span>
+            </header>
+            <p>Оберіть допустиму глибину розрядження акумулятора.</p>
+            <input type="range" id="reserve-range" min="60" max="100" step="1" value="85" aria-label="Резерв батареї, %" />
+            <div class="tuning-presets" role="group" aria-label="Швидкі значення резерву">
+              <button type="button" data-reserve-preset="70">70%</button>
+              <button type="button" data-reserve-preset="80">80%</button>
+              <button type="button" data-reserve-preset="85" class="active">85%</button>
+            </div>
+          </article>
+        </div>
+        <div class="scenario-actions">
+          <button type="button" id="save-scenario" class="scenario-button">Зберегти локально</button>
+          <button type="button" id="reset-scenario" class="scenario-button subtle">Очистити</button>
+          <button type="button" id="export-scenario" class="scenario-button">Експорт JSON</button>
+          <button type="button" id="import-scenario" class="scenario-button">Імпорт JSON</button>
+          <button type="button" id="share-scenario" class="scenario-button highlight">Поділитися конфігурацією</button>
+          <input type="file" id="scenario-file" accept="application/json" hidden />
+        </div>
+        <p class="scenario-feedback" id="scenario-feedback" role="status" aria-live="polite"></p>
+      </section>
+
       <section class="selected-devices hidden" id="selected-section">
         <div class="section-heading">
           <h2>Вибрані пристрої</h2>
@@ -57,9 +103,16 @@
           <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
         </article>
         <article class="summary-card">
-          <h3>Споживання з урахуванням ККД та резерву (≈90%)</h3>
+          <h3>Споживання з урахуванням втрат</h3>
           <p class="summary-value" id="total-buffered">0 Wh</p>
-          <p class="summary-helper">Запас енергії для інвертора та захисту від глибокого розрядження батареї.</p>
+          <p class="summary-helper" id="buffer-helper">
+            ККД: 90% · Резерв батареї: 85% · Запас енергії на випадок втрат та захисту акумулятора.
+          </p>
+        </article>
+        <article class="summary-card">
+          <h3>Максимальна потужність навантаження</h3>
+          <p class="summary-value" id="total-power">0 W</p>
+          <p class="summary-helper">Сумарна миттєва потужність усіх вибраних пристроїв.</p>
         </article>
         <article class="summary-card recommendation" id="recommendation-card">
           <div class="recommendation-header">
@@ -93,6 +146,14 @@
           <p>Нижче наведені зарядні станції, що також можуть підійти під ваші потреби.</p>
         </div>
         <div class="alternative-grid" id="alternative-list"></div>
+      </section>
+
+      <section class="breakdown" id="breakdown" aria-label="Розподіл споживання за категоріями">
+        <div class="section-heading">
+          <h2>Розподіл споживання</h2>
+          <p>Перегляньте, які категорії техніки формують найбільше навантаження.</p>
+        </div>
+        <div class="breakdown-grid" id="category-breakdown"></div>
       </section>
 
       <footer class="app-footer">
