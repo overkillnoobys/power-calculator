@@ -129,11 +129,49 @@ h1 {
   color: var(--muted);
 }
 
-.device-controls {
+.device-quick-actions {
+  margin-top: 1rem;
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.device-add {
+  width: 100%;
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(139, 92, 246, 0.16);
+  color: var(--accent-strong);
+  border: 1px solid transparent;
+  transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease;
+}
+
+.device-add:hover {
+  background: rgba(139, 92, 246, 0.28);
+  transform: translateY(-1px);
+}
+
+.device-add:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.device-card.active .device-add {
+  display: none;
+}
+
+.device-controls {
+  display: none;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 1rem;
+}
+
+.device-card.active .device-controls {
+  display: flex;
 }
 
 .device-controls button {
@@ -167,6 +205,37 @@ h1 {
   padding: 0.45rem 0.35rem;
   color: var(--text);
   font-size: 1rem;
+}
+
+.variant-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.variant-select {
+  width: 100%;
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  background: rgba(16, 10, 32, 0.8);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.variant-select:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.variant-power {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .device-quantity-pill {
@@ -240,6 +309,7 @@ tbody td {
   padding: 0.75rem 0.85rem;
   border-bottom: 1px solid rgba(139, 92, 246, 0.1);
   font-size: 0.95rem;
+  vertical-align: top;
 }
 
 .quantity-controls,

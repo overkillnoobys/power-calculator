@@ -3,10 +3,33 @@ const devices = [
   { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10 },
   { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2 },
   { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4 },
-  { id: 5, category: 'Електроніка', name: 'Монітор', watts: 50, hours: 4 },
-  { id: 6, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3 },
-  { id: 7, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5 },
-  { id: 8, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2 },
+  {
+    id: 5,
+    category: 'Електроніка',
+    name: 'Монітор',
+    watts: 50,
+    hours: 4,
+    variants: [
+      { id: 'monitor-small', label: 'До 27″ — 50 Вт', watts: 50 },
+      { id: 'monitor-large', label: 'Від 27″ — 70 Вт', watts: 70 },
+      { id: 'monitor-pro', label: 'Ігровий / професійний — 100 Вт', watts: 100 }
+    ]
+  },
+  {
+    id: 6,
+    category: 'Електроніка',
+    name: 'Комп’ютер',
+    watts: 150,
+    hours: 4,
+    variants: [
+      { id: 'pc-office', label: 'Офісний — 150 Вт', watts: 150 },
+      { id: 'pc-gaming', label: 'Ігровий — 500 Вт', watts: 500 },
+      { id: 'pc-workstation', label: 'Робоча станція — 750 Вт', watts: 750 }
+    ]
+  },
+  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3 },
+  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5 },
+  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2 },
   { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12 },
   { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1 },
   { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1 },
@@ -102,7 +125,22 @@ const stations = [
   }
 ];
 
-const state = new Map(devices.map((device) => [device.id, { ...device, quantity: 0 }]));
+const state = new Map(
+  devices.map((device) => {
+    const hasVariants = Array.isArray(device.variants) && device.variants.length > 0;
+    const initialVariant = hasVariants ? device.variants[0] : null;
+
+    return [
+      device.id,
+      {
+        ...device,
+        quantity: 0,
+        variantId: initialVariant ? initialVariant.id : null,
+        watts: initialVariant ? initialVariant.watts : device.watts
+      }
+    ];
+  })
+);
 
 const CONSULTATION_URL = 'https://martin-shop.online/contact/';
 
@@ -129,6 +167,20 @@ function formatNumber(value, digits = 0) {
   });
 }
 
+function getVariant(device, variantId = device.variantId) {
+  if (!Array.isArray(device.variants)) {
+    return null;
+  }
+  return device.variants.find((variant) => variant.id === variantId) || device.variants[0] || null;
+}
+
+function getDeviceMetaText(device) {
+  const variant = getVariant(device);
+  const powerText = variant ? variant.label : `${formatNumber(device.watts)} Вт`;
+  const hoursText = typeof device.hours === 'number' ? `${formatNumber(device.hours, device.hours % 1 === 0 ? 0 : 1)} год` : '';
+  return hoursText ? `${powerText} • ${hoursText}` : powerText;
+}
+
 function setQuantity(id, quantity) {
   const device = state.get(id);
   if (!device) return;
@@ -151,6 +203,22 @@ function setHours(id, hours) {
   }
   const clamped = Math.max(0, Math.min(24, nextValue));
   device.hours = Math.round(clamped * 10) / 10;
+  updateInterface();
+}
+
+function setVariant(id, variantId) {
+  const device = state.get(id);
+  if (!device || !Array.isArray(device.variants)) {
+    return;
+  }
+
+  const nextVariant = getVariant(device, variantId);
+  if (!nextVariant) {
+    return;
+  }
+
+  device.variantId = nextVariant.id;
+  device.watts = nextVariant.watts;
   updateInterface();
 }
 
@@ -187,8 +255,22 @@ function createCategorySection(category) {
 
     const meta = document.createElement('p');
     meta.className = 'device-meta';
-    meta.textContent = `${device.watts} Вт • ${device.hours} год`;
+    meta.textContent = getDeviceMetaText(device);
     card.appendChild(meta);
+
+    const quickActions = document.createElement('div');
+    quickActions.className = 'device-quick-actions';
+
+    const addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'device-add';
+    addButton.textContent = 'Додати';
+    addButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const current = state.get(device.id);
+      const nextQuantity = current && current.quantity > 0 ? current.quantity : 1;
+      setQuantity(device.id, nextQuantity);
+    });
 
     const controls = document.createElement('div');
     controls.className = 'device-controls';
@@ -209,9 +291,11 @@ function createCategorySection(category) {
     input.max = '99';
     input.value = String(device.quantity);
     input.addEventListener('input', (event) => {
+      event.stopPropagation();
       const target = event.target;
       setQuantity(device.id, target.value);
     });
+    input.addEventListener('click', (event) => event.stopPropagation());
 
     const plus = document.createElement('button');
     plus.type = 'button';
@@ -223,7 +307,8 @@ function createCategorySection(category) {
     });
 
     controls.append(minus, input, plus);
-    card.appendChild(controls);
+    quickActions.append(addButton, controls);
+    card.appendChild(quickActions);
 
     card.addEventListener('click', () => {
       const current = state.get(device.id);
@@ -232,7 +317,7 @@ function createCategorySection(category) {
     });
 
     grid.appendChild(card);
-    cardRegistry.set(device.id, { card, quantityPill: pill, input });
+    cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton });
   });
 
   section.appendChild(grid);
@@ -307,6 +392,38 @@ function createHourControls(device) {
   return { wrapper, input };
 }
 
+function createVariantSelector(device) {
+  if (!Array.isArray(device.variants) || device.variants.length === 0) {
+    return null;
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'variant-selector';
+
+  const select = document.createElement('select');
+  select.className = 'variant-select';
+
+  device.variants.forEach((variant) => {
+    const option = document.createElement('option');
+    option.value = variant.id;
+    option.textContent = variant.label;
+    select.appendChild(option);
+  });
+
+  select.value = device.variantId || device.variants[0].id;
+  select.addEventListener('change', (event) => {
+    const target = event.target;
+    setVariant(device.id, target.value);
+  });
+
+  const currentPower = document.createElement('span');
+  currentPower.className = 'variant-power';
+  currentPower.textContent = `Поточна потужність: ${formatNumber(device.watts)} Вт`;
+
+  wrapper.append(select, currentPower);
+  return { wrapper, select, currentPower };
+}
+
 function renderSelectedDevices(selectedDevices) {
   selectedTableBody.innerHTML = '';
 
@@ -323,7 +440,12 @@ function renderSelectedDevices(selectedDevices) {
     row.appendChild(quantityCell);
 
     const powerCell = document.createElement('td');
-    powerCell.textContent = `${formatNumber(device.watts)} Вт`;
+    const variantControls = createVariantSelector(device);
+    if (variantControls) {
+      powerCell.appendChild(variantControls.wrapper);
+    } else {
+      powerCell.textContent = `${formatNumber(device.watts)} Вт`;
+    }
     row.appendChild(powerCell);
 
     const hoursCell = document.createElement('td');
@@ -469,37 +591,29 @@ function renderAlternatives(alternatives, selectedStation) {
 }
 
 function updateInterface() {
-  const selectedDevices = Array.from(state.values()).filter((device) => device.quantity > 0);
-
-  selectedSection.classList.toggle('hidden', selectedDevices.length === 0);
-
-  renderSelectedDevices(selectedDevices);
-
+  const selectedDevices = [];
   let totalPower = 0;
   let totalEnergy = 0;
 
-  selectedDevices.forEach((device) => {
-    totalPower += device.watts * device.quantity;
-    totalEnergy += device.watts * device.quantity * device.hours;
+  state.forEach((device) => {
+    if (device.quantity > 0) {
+      selectedDevices.push(device);
+      totalPower += device.watts * device.quantity;
+      totalEnergy += device.watts * device.quantity * device.hours;
+    }
 
     const cardMeta = cardRegistry.get(device.id);
     if (cardMeta) {
-      cardMeta.card.classList.add('active');
+      cardMeta.card.classList.toggle('active', device.quantity > 0);
       cardMeta.quantityPill.textContent = `x${device.quantity}`;
       cardMeta.input.value = String(device.quantity);
+      cardMeta.meta.textContent = getDeviceMetaText(device);
+      cardMeta.addButton.textContent = device.quantity > 0 ? 'Обрано' : 'Додати';
     }
   });
 
-  state.forEach((device) => {
-    if (!selectedDevices.includes(device)) {
-      const cardMeta = cardRegistry.get(device.id);
-      if (cardMeta) {
-        cardMeta.card.classList.remove('active');
-        cardMeta.quantityPill.textContent = 'x0';
-        cardMeta.input.value = String(device.quantity);
-      }
-    }
-  });
+  selectedSection.classList.toggle('hidden', selectedDevices.length === 0);
+  renderSelectedDevices(selectedDevices);
 
   totalPowerEl.textContent = `${formatNumber(totalPower)} Вт`;
   totalEnergyEl.textContent = `${formatNumber(totalEnergy)} Wh`;
