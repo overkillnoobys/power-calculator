@@ -993,49 +993,7 @@ function createCategorySection(category, index) {
     header.appendChild(addButton);
     card.appendChild(header);
 
-    let input = null;
-    if (device.allowQuantity) {
-      const quickActions = document.createElement('div');
-      quickActions.className = 'device-quick-actions';
-
-      const controls = document.createElement('div');
-      controls.className = 'device-controls';
-
-      const minus = document.createElement('button');
-      minus.type = 'button';
-      minus.setAttribute('aria-label', `Зменшити кількість для ${device.name}`);
-      minus.textContent = '−';
-      minus.addEventListener('click', (event) => {
-        event.stopPropagation();
-        adjustQuantity(device.id, -1);
-      });
-
-      input = document.createElement('input');
-      input.type = 'number';
-      input.inputMode = 'numeric';
-      input.min = '0';
-      input.max = String(device.maxQuantity);
-      input.value = String(device.quantity);
-      input.addEventListener('input', (event) => {
-        event.stopPropagation();
-        const target = event.target;
-        setQuantity(device.id, target.value);
-      });
-      input.addEventListener('click', (event) => event.stopPropagation());
-
-      const plus = document.createElement('button');
-      plus.type = 'button';
-      plus.setAttribute('aria-label', `Збільшити кількість для ${device.name}`);
-      plus.textContent = '+';
-      plus.addEventListener('click', (event) => {
-        event.stopPropagation();
-        adjustQuantity(device.id, 1);
-      });
-
-      controls.append(minus, input, plus);
-      quickActions.append(controls);
-      card.appendChild(quickActions);
-    }
+    const input = null;
 
     grid.appendChild(card);
     cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton });

@@ -247,25 +247,6 @@ h1 {
   height: 100%;
 }
 
-.device-quick-actions {
-  margin-top: auto;
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  margin-top: 0;
-  transition: grid-template-rows 0.32s ease, opacity 0.32s ease, margin-top 0.32s ease;
-  pointer-events: none;
-}
-
-.device-card.single-unit .device-quick-actions {
-  display: none;
-}
-
-.device-quick-actions > * {
-  overflow: hidden;
-  min-height: 0;
-}
-
 .device-add {
   width: 28px;
   height: 28px;
@@ -311,61 +292,6 @@ h1 {
   opacity: 0.35;
   cursor: not-allowed;
   transform: none;
-}
-
-.device-card.active .device-quick-actions {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  margin-top: 0.35rem;
-  pointer-events: auto;
-}
-
-.device-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.32rem;
-  padding-top: 0.1rem;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity 0.28s ease, transform 0.28s ease;
-}
-
-.device-card.active .device-controls {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.device-controls button {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
-  border: 1px solid transparent;
-  background: rgba(139, 92, 246, 0.15);
-  color: var(--accent-strong);
-  font-size: 1rem;
-  display: grid;
-  place-items: center;
-  transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease;
-}
-
-.device-controls button:hover {
-  background: rgba(139, 92, 246, 0.35);
-  transform: translateY(-1px);
-}
-
-.device-controls button:active {
-  transform: translateY(1px) scale(0.97);
-}
-
-.device-controls input {
-  width: 38px;
-  text-align: center;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(16, 10, 32, 0.8);
-  padding: 0.28rem 0.25rem;
-  color: var(--text);
-  font-size: 0.85rem;
 }
 
 .variant-selector {
@@ -437,8 +363,8 @@ h1 {
 
 .device-quantity-pill {
   position: absolute;
-  top: 6px;
-  right: 8px;
+  top: 8px;
+  right: 10px;
   border-radius: 999px;
   padding: 0.12rem 0.4rem;
   font-size: 0.66rem;
@@ -448,11 +374,18 @@ h1 {
   opacity: 0;
   transform: translateY(-6px);
   transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .device-card.active .device-quantity-pill {
   opacity: 1;
   transform: translateY(0);
+}
+
+.device-card.single-unit .device-quantity-pill {
+  right: 44px;
+  top: 10px;
 }
 
 .section-heading h2 {
@@ -1486,14 +1419,12 @@ tbody td {
     padding: 0.35rem 0.45rem;
   }
 
-  .device-controls button,
   .quantity-controls button,
   .time-value-controls button {
     width: 28px;
     height: 28px;
   }
 
-  .device-controls input,
   .quantity-controls input,
   .time-value-controls input {
     width: 48px;
