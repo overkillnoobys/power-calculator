@@ -925,6 +925,7 @@ function createCategorySection(category, index) {
     }
     card.dataset.deviceId = String(device.id);
     card.setAttribute('aria-expanded', 'false');
+    card.tabIndex = 0;
 
     const pill = document.createElement('span');
     pill.className = 'device-quantity-pill';
@@ -1002,6 +1003,32 @@ function createCategorySection(category, index) {
 
     grid.appendChild(card);
     cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton, subtractButton });
+
+    card.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest('button')) {
+        return;
+      }
+
+      const current = state.get(device.id);
+      const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
+      if (device.allowQuantity) {
+        if (base <= 0) {
+          setQuantity(device.id, 1);
+        }
+        return;
+      }
+
+      const next = base > 0 ? 0 : 1;
+      setQuantity(device.id, next);
+    });
+
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        card.click();
+      }
+    });
   });
 
   content.appendChild(grid);
