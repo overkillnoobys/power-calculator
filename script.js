@@ -387,8 +387,7 @@ const stations = [
     model: 'Apex 300',
     capacityWh: 2700,
     powerW: 3800,
-    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-bluetti-apex-300-2700wh-750000mah-3800w/',
-    image: 'https://martin-shop.online/Media/shop-32497/_imports/powerstation/Bluetti4/PB931453img.jpg'
+    link: 'https://martin-shop.online/shop/zaryadna-stantsiya-bluetti-apex-300-2700wh-750000mah-3800w/'
   },
   {
     name: 'Bluetti AC180',
@@ -1622,11 +1621,13 @@ function renderRecommendation(recommendation, totalPower, totalEnergy) {
     stationLinkEl.href = '#';
     stationConsultEl.classList.add('disabled');
     stationConsultEl.href = CONSULTATION_URL;
+    recommendationCard.classList.remove('has-media');
     alternativesSection.style.display = 'none';
     return;
   }
 
   const { station, alternatives } = recommendation;
+  const hasImage = Boolean(station.image);
 
   const energyMatch = station.capacityWh >= totalEnergy;
   const powerMatch = station.powerW >= totalPower;
@@ -1642,7 +1643,7 @@ function renderRecommendation(recommendation, totalPower, totalEnergy) {
   stationNameEl.textContent = station.name;
   stationSpecsEl.innerHTML = '';
 
-  if (stationImageEl && station.image) {
+  if (stationImageEl && hasImage) {
     stationImageEl.src = station.image;
     stationImageEl.alt = `Зарядна станція ${station.name}`;
   } else if (stationImageEl) {
@@ -1651,7 +1652,7 @@ function renderRecommendation(recommendation, totalPower, totalEnergy) {
   }
 
   if (stationMediaEl) {
-    if (station.image) {
+    if (hasImage) {
       stationMediaEl.classList.remove('is-empty');
       stationMediaEl.setAttribute('aria-hidden', 'false');
     } else {
@@ -1659,6 +1660,8 @@ function renderRecommendation(recommendation, totalPower, totalEnergy) {
       stationMediaEl.setAttribute('aria-hidden', 'true');
     }
   }
+
+  recommendationCard.classList.toggle('has-media', hasImage);
 
   const specs = [
     { label: 'Модель', value: station.model },
@@ -1719,7 +1722,10 @@ function renderAlternatives(alternatives, selectedStation) {
     const media = document.createElement('figure');
     media.className = 'alternative-media';
 
-    if (station.image) {
+    const hasImage = Boolean(station.image);
+    card.classList.toggle('has-media', hasImage);
+
+    if (hasImage) {
       const img = document.createElement('img');
       img.src = station.image;
       img.alt = `Зарядна станція ${station.name}`;
