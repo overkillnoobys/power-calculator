@@ -436,6 +436,12 @@ const saveScenarioBtn = document.getElementById('save-scenario');
 const resetScenarioBtn = document.getElementById('reset-scenario');
 const shareScenarioBtn = document.getElementById('share-scenario');
 const scenarioFeedbackEl = document.getElementById('scenario-feedback');
+const shareDialogEl = document.getElementById('share-dialog');
+const shareUrlInput = document.getElementById('share-url');
+const copyShareLinkBtn = document.getElementById('copy-share-link');
+const shareOptionElements = shareDialogEl ? Array.from(shareDialogEl.querySelectorAll('.share-option')) : [];
+const infoTriggerBtn = document.querySelector('.info-trigger');
+const infoTooltipEl = document.getElementById('buffer-tooltip');
 
 const BUFFER_FACTOR = 0.94;
 const BUFFER_PERCENT = Math.round(BUFFER_FACTOR * 100);
@@ -456,6 +462,11 @@ const categoryPreferences = new Map();
 let pendingCategoryPreferences = null;
 let isRestoringState = false;
 let scenarioFeedbackTimer = null;
+let previousFocusElement = null;
+let shareDialogHideTimer = null;
+let currentShareUrl = '';
+let tooltipVisible = false;
+let tooltipHideTimer = null;
 function showSelectedSection() {
   if (!selectedSection) {
     return;
@@ -1861,21 +1872,34 @@ function decodeScenarioFromParam(param) {
   }
 }
 
-async function copyScenarioLink() {
+function buildScenarioUrl() {
   if (typeof window === 'undefined') {
-    return;
+    return null;
   }
 
   const payload = serializeState();
   const encoded = encodeScenarioForUrl(payload);
   if (!encoded) {
-    showScenarioMessage('Не вдалося сформувати посилання.', 'error');
-    return;
+    return null;
   }
 
   const url = new URL(window.location.href);
   url.searchParams.set('setup', encoded);
-  const shareUrl = url.toString();
+  return url.toString();
+}
+
+async function copyScenarioLink(explicitUrl, { silent = false } = {}) {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const shareUrl = explicitUrl || buildScenarioUrl();
+  if (!shareUrl) {
+    if (!silent) {
+      showScenarioMessage('Не вдалося сформувати посилання.', 'error');
+    }
+    return false;
+  }
 
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1891,11 +1915,205 @@ async function copyScenarioLink() {
       document.execCommand('copy');
       document.body.removeChild(textarea);
     }
-    showScenarioMessage('Посилання скопійовано у буфер обміну.', 'success');
+    if (!silent) {
+      showScenarioMessage('Посилання скопійовано у буфер обміну.', 'success');
+    }
+    return true;
   } catch (error) {
     console.warn('Не вдалося скопіювати посилання', error);
-    showScenarioMessage('Скопіюйте посилання вручну: ' + shareUrl, 'error');
+    if (!silent) {
+      showScenarioMessage('Скопіюйте посилання вручну: ' + shareUrl, 'error');
+    }
+    return false;
   }
+}
+
+function updateShareOptionLinks(shareUrl) {
+  if (!shareOptionElements.length) {
+    return;
+  }
+
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const baseMessage = 'Переглянь мою конфігурацію зарядних станцій:';
+  const encodedText = encodeURIComponent(`${baseMessage} ${shareUrl}`);
+  const encodedMessageOnly = encodeURIComponent(baseMessage);
+
+  shareOptionElements.forEach((option) => {
+    if (!(option instanceof HTMLAnchorElement)) {
+      return;
+    }
+    const network = option.dataset.network;
+    let href = shareUrl;
+    switch (network) {
+      case 'telegram':
+        href = `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessageOnly}`;
+        break;
+      case 'viber':
+        href = `viber://forward?text=${encodedText}`;
+        break;
+      case 'whatsapp':
+        href = `https://wa.me/?text=${encodedText}`;
+        break;
+      case 'facebook':
+        href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        break;
+      default:
+        href = shareUrl;
+    }
+    option.href = href;
+  });
+}
+
+function openShareDialog(shareUrl) {
+  if (!shareDialogEl) {
+    copyScenarioLink(shareUrl);
+    return;
+  }
+
+  currentShareUrl = shareUrl;
+  if (shareUrlInput) {
+    shareUrlInput.value = shareUrl;
+  }
+  updateShareOptionLinks(shareUrl);
+
+  if (shareDialogHideTimer) {
+    window.clearTimeout(shareDialogHideTimer);
+    shareDialogHideTimer = null;
+  }
+
+  if (tooltipVisible) {
+    setTooltipVisibility(false);
+  }
+
+  shareDialogEl.hidden = false;
+  shareDialogEl.setAttribute('data-open', 'true');
+  previousFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const focusTarget = shareDialogEl.querySelector('.share-close');
+  window.requestAnimationFrame(() => {
+    if (focusTarget && typeof focusTarget.focus === 'function') {
+      focusTarget.focus();
+    }
+  });
+}
+
+function closeShareDialog({ restoreFocus = true } = {}) {
+  if (!shareDialogEl) {
+    return;
+  }
+
+  shareDialogEl.setAttribute('data-open', 'false');
+  if (shareDialogHideTimer) {
+    window.clearTimeout(shareDialogHideTimer);
+  }
+  shareDialogHideTimer = window.setTimeout(() => {
+    if (shareDialogEl.dataset.open !== 'true') {
+      shareDialogEl.hidden = true;
+    }
+    shareDialogHideTimer = null;
+  }, 540);
+
+  if (restoreFocus && previousFocusElement && typeof previousFocusElement.focus === 'function') {
+    previousFocusElement.focus();
+  }
+  previousFocusElement = null;
+  currentShareUrl = '';
+}
+
+async function handleShareScenario() {
+  const shareUrl = buildScenarioUrl();
+  if (!shareUrl) {
+    showScenarioMessage('Не вдалося сформувати посилання.', 'error');
+    return;
+  }
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Конфігурація зарядної станції',
+        text: 'Переглянь мою конфігурацію зарядних станцій.',
+        url: shareUrl
+      });
+      showScenarioMessage('Посилання успішно надіслано.', 'success');
+      return;
+    } catch (error) {
+      if (error && error.name === 'AbortError') {
+        return;
+      }
+      console.warn('Системне меню поширення недоступне', error);
+    }
+  }
+
+  if (shareDialogEl) {
+    openShareDialog(shareUrl);
+  } else {
+    await copyScenarioLink(shareUrl);
+  }
+}
+
+function setTooltipVisibility(visible) {
+  if (!infoTriggerBtn || !infoTooltipEl) {
+    return;
+  }
+
+  tooltipVisible = visible;
+  if (tooltipHideTimer) {
+    window.clearTimeout(tooltipHideTimer);
+    tooltipHideTimer = null;
+  }
+  infoTooltipEl.dataset.visible = visible ? 'true' : 'false';
+  infoTriggerBtn.setAttribute('aria-expanded', visible ? 'true' : 'false');
+  infoTooltipEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
+}
+
+function scheduleTooltipHide(delay = 120) {
+  if (tooltipHideTimer) {
+    window.clearTimeout(tooltipHideTimer);
+  }
+  tooltipHideTimer = window.setTimeout(() => {
+    setTooltipVisibility(false);
+  }, delay);
+}
+
+function initializeInfoTooltip() {
+  if (!infoTriggerBtn || !infoTooltipEl) {
+    return;
+  }
+
+  infoTriggerBtn.setAttribute('aria-expanded', 'false');
+  setTooltipVisibility(false);
+
+  infoTriggerBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    setTooltipVisibility(!tooltipVisible);
+  });
+
+  infoTriggerBtn.addEventListener('mouseenter', () => {
+    setTooltipVisibility(true);
+  });
+
+  infoTriggerBtn.addEventListener('mouseleave', () => {
+    scheduleTooltipHide();
+  });
+
+  infoTriggerBtn.addEventListener('focus', () => {
+    setTooltipVisibility(true);
+  });
+
+  infoTriggerBtn.addEventListener('blur', () => {
+    scheduleTooltipHide(160);
+  });
+
+  infoTooltipEl.addEventListener('mouseenter', () => {
+    if (tooltipHideTimer) {
+      window.clearTimeout(tooltipHideTimer);
+      tooltipHideTimer = null;
+    }
+    setTooltipVisibility(true);
+  });
+
+  infoTooltipEl.addEventListener('mouseleave', () => {
+    scheduleTooltipHide();
+  });
 }
 
 function loadScenarioFromStorage() {
@@ -1959,8 +2177,72 @@ function initializeScenarioControls() {
 
   if (shareScenarioBtn) {
     shareScenarioBtn.addEventListener('click', () => {
-      copyScenarioLink();
+      handleShareScenario();
     });
+  }
+}
+
+function initializeShareDialog() {
+  if (!shareDialogEl) {
+    return;
+  }
+
+  shareDialogEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (target instanceof HTMLElement && target.hasAttribute('data-share-close')) {
+      event.preventDefault();
+      closeShareDialog();
+    }
+  });
+
+  shareDialogEl.addEventListener('transitionend', (event) => {
+    if (event.target === shareDialogEl && shareDialogEl.dataset.open !== 'true') {
+      shareDialogEl.hidden = true;
+    }
+  });
+
+  if (copyShareLinkBtn) {
+    copyShareLinkBtn.addEventListener('click', async () => {
+      const urlToCopy = currentShareUrl || buildScenarioUrl();
+      await copyScenarioLink(urlToCopy || undefined);
+    });
+  }
+
+  if (shareOptionElements.length > 0) {
+    shareOptionElements.forEach((option) => {
+      option.addEventListener('click', () => {
+        closeShareDialog({ restoreFocus: false });
+      });
+    });
+  }
+}
+
+function handleDocumentPointerDown(event) {
+  if (tooltipVisible && infoTooltipEl && infoTriggerBtn) {
+    const target = event.target;
+    if (
+      target instanceof Node &&
+      !infoTooltipEl.contains(target) &&
+      !infoTriggerBtn.contains(target)
+    ) {
+      setTooltipVisibility(false);
+    }
+  }
+}
+
+function handleDocumentKeyDown(event) {
+  if (event.key !== 'Escape') {
+    return;
+  }
+
+  if (shareDialogEl && shareDialogEl.dataset.open === 'true') {
+    event.preventDefault();
+    closeShareDialog();
+    return;
+  }
+
+  if (tooltipVisible) {
+    setTooltipVisibility(false);
   }
 }
 
@@ -2071,4 +2353,8 @@ if (!loadedFromQuery) {
 
 renderCategories();
 initializeScenarioControls();
+initializeShareDialog();
+initializeInfoTooltip();
+document.addEventListener('pointerdown', handleDocumentPointerDown);
+document.addEventListener('keydown', handleDocumentKeyDown);
 updateInterface();

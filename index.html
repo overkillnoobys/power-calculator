@@ -28,29 +28,17 @@
 
       <section class="device-categories" id="device-categories" aria-label="Категорії пристроїв"></section>
 
-      <section class="tuning" id="tuning">
-        <div class="tuning-heading">
-          <h2>Налаштування сценарію</h2>
-          <p>
-            Керуйте втратами енергії та зберігайте власні конфігурації, щоб швидко повертатися до потрібних розрахунків.
-          </p>
-        </div>
-        <div class="tuning-grid">
-          <article class="tuning-card">
-            <header>
-              <h3>ККД та резерв батареї</h3>
-              <span class="tuning-value" aria-label="Сумарний ККД та резерв батареї">94%</span>
-            </header>
-            <p>
-              Усі розрахунки враховують сумарний ККД інвертора та резерв батареї. Статичне значення 94% поєднує втрати на
-              перетворення та допустимий запас ємності.
-            </p>
-          </article>
-        </div>
-        <div class="scenario-actions">
-          <button type="button" id="save-scenario" class="scenario-button">Зберегти конфігурацію</button>
-          <button type="button" id="reset-scenario" class="scenario-button subtle">Очистити конфігурацію</button>
-          <button type="button" id="share-scenario" class="scenario-button highlight">Поділитися конфігурацією</button>
+      <section class="scenario-toolbar" id="tuning" aria-label="Дії зі сценарієм">
+        <div class="scenario-actions" role="group" aria-label="Зберігання та поширення конфігурації">
+          <button type="button" id="save-scenario" class="scenario-button" aria-label="Зберегти конфігурацію">
+            <span aria-hidden="true">💾</span>
+          </button>
+          <button type="button" id="reset-scenario" class="scenario-button subtle" aria-label="Очистити конфігурацію">
+            <span aria-hidden="true">♻️</span>
+          </button>
+          <button type="button" id="share-scenario" class="scenario-button highlight" aria-label="Поділитися конфігурацією">
+            <span aria-hidden="true">📤</span>
+          </button>
         </div>
         <p class="scenario-feedback" id="scenario-feedback" role="status" aria-live="polite"></p>
       </section>
@@ -83,12 +71,21 @@
           <p class="summary-value" id="total-energy">0 Wh</p>
           <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
         </article>
-        <article class="summary-card">
-          <h3>Споживання з урахуванням ККД та резерву</h3>
+        <article class="summary-card summary-buffer">
+          <div class="summary-title-with-info">
+            <h3>Споживання з урахуванням ККД та резерву</h3>
+            <button type="button" class="info-trigger" aria-describedby="buffer-tooltip" aria-label="Пояснення ККД та резерву">
+              i
+            </button>
+            <div class="info-tooltip" id="buffer-tooltip" role="tooltip" aria-hidden="true">
+              <p>
+                ККД враховує втрати інвертора, а резерв батареї запобігає глибокому розряджанню. Ми застосовуємо спільний
+                коефіцієнт 94%, щоб підказати необхідну ємність станції з комфортним запасом.
+              </p>
+            </div>
+          </div>
           <p class="summary-value" id="total-buffered">0 Wh</p>
-          <p class="summary-helper" id="buffer-helper">
-            Враховано сумарний ККД інвертора та резерв батареї (94%).
-          </p>
+          <p class="summary-helper" id="buffer-helper">Враховано сумарний ККД інвертора та резерв батареї (94%).</p>
         </article>
         <article class="summary-card">
           <h3>Максимальна потужність навантаження</h3>
@@ -144,6 +141,43 @@
         </p>
       </footer>
     </main>
+
+    <div
+      class="share-dialog"
+      id="share-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="share-dialog-title"
+      data-open="false"
+      hidden
+    >
+      <div class="share-backdrop" data-share-close aria-hidden="true"></div>
+      <div class="share-panel" role="document">
+        <header class="share-panel-header">
+          <h2 id="share-dialog-title">Поділитися конфігурацією</h2>
+          <button type="button" class="share-close" data-share-close aria-label="Закрити вікно">✕</button>
+        </header>
+        <p class="share-panel-lead">Оберіть зручний спосіб, щоб надіслати сценарій друзям або колегам.</p>
+        <div class="share-options" role="list">
+          <a class="share-option" data-network="telegram" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>Telegram</span>
+          </a>
+          <a class="share-option" data-network="viber" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>Viber</span>
+          </a>
+          <a class="share-option" data-network="whatsapp" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>WhatsApp</span>
+          </a>
+          <a class="share-option" data-network="facebook" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>Facebook</span>
+          </a>
+        </div>
+        <div class="share-url">
+          <input type="text" id="share-url" readonly aria-label="Посилання на конфігурацію" />
+          <button type="button" id="copy-share-link" class="copy-share">Скопіювати</button>
+        </div>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>
