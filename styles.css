@@ -905,11 +905,6 @@ tbody td {
   --recommendation-media-size: 8.75rem;
 }
 
-.recommendation.has-media {
-  padding-right: calc(var(--recommendation-media-size) + 2rem);
-  min-height: calc(var(--recommendation-media-size) + 2.4rem);
-}
-
 .recommendation::after {
   content: '';
   position: absolute;
@@ -932,8 +927,16 @@ tbody td {
 }
 
 .recommendation-body {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.2rem;
   margin-top: 1.2rem;
+}
+
+.recommendation.has-media .recommendation-body {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 1.6rem;
 }
 
 .recommendation-info {
@@ -947,9 +950,7 @@ tbody td {
 }
 
 .recommendation-media {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
+  position: relative;
   margin: 0;
   width: var(--recommendation-media-size);
   height: var(--recommendation-media-size);
@@ -964,6 +965,8 @@ tbody td {
   transition:
     transform var(--transition-medium) var(--ease-soft),
     box-shadow var(--transition-medium) var(--ease-soft);
+  justify-self: end;
+  align-self: center;
   z-index: 1;
 }
 
@@ -1519,10 +1522,6 @@ tbody td {
     --recommendation-media-size: 8.25rem;
   }
 
-  .recommendation.has-media {
-    padding-right: calc(var(--recommendation-media-size) + 1.8rem);
-  }
-
 }
 
 @media (max-width: 900px) {
@@ -1575,8 +1574,12 @@ tbody td {
     --recommendation-media-size: 7rem;
   }
 
-  .recommendation.has-media {
-    padding-right: calc(var(--recommendation-media-size) + 1.4rem);
+  .recommendation.has-media .recommendation-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recommendation.has-media .recommendation-media {
+    justify-self: center;
   }
 
   .alternative-card {
@@ -1600,10 +1603,6 @@ tbody td {
 
   .recommendation {
     --recommendation-media-size: 6.25rem;
-  }
-
-  .recommendation.has-media {
-    padding-right: calc(var(--recommendation-media-size) + 1.15rem);
   }
 
   .alternative-card {
@@ -1779,10 +1778,6 @@ tbody td {
     --recommendation-media-size: 5.8rem;
   }
 
-  .recommendation.has-media {
-    padding-right: calc(var(--recommendation-media-size) + 1rem);
-  }
-
   .alternative-card {
     --alternative-media-size: 3.9rem;
   }
@@ -1889,10 +1884,6 @@ tbody td {
 
   .recommendation {
     --recommendation-media-size: 5.1rem;
-  }
-
-  .recommendation.has-media {
-    padding-right: calc(var(--recommendation-media-size) + 0.9rem);
   }
 
   .alternative-card {
