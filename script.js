@@ -417,10 +417,6 @@ const state = new Map(
 const CONSULTATION_URL = 'https://martin-shop.online/contact/';
 
 const deviceCategoriesElement = document.getElementById('device-categories');
-const efficiencyRange = document.getElementById('efficiency-range');
-const efficiencyOutput = document.getElementById('efficiency-output');
-const reserveRange = document.getElementById('reserve-range');
-const reserveOutput = document.getElementById('reserve-output');
 const bufferHelperEl = document.getElementById('buffer-helper');
 const selectedSection = document.getElementById('selected-section');
 const selectedTableBody = document.getElementById('selected-devices');
@@ -438,13 +434,11 @@ const alternativeListEl = document.getElementById('alternative-list');
 const categoryBreakdownEl = document.getElementById('category-breakdown');
 const saveScenarioBtn = document.getElementById('save-scenario');
 const resetScenarioBtn = document.getElementById('reset-scenario');
-const exportScenarioBtn = document.getElementById('export-scenario');
-const importScenarioBtn = document.getElementById('import-scenario');
 const shareScenarioBtn = document.getElementById('share-scenario');
-const scenarioFileInput = document.getElementById('scenario-file');
 const scenarioFeedbackEl = document.getElementById('scenario-feedback');
-const effPresetButtons = document.querySelectorAll('[data-eff-preset]');
-const reservePresetButtons = document.querySelectorAll('[data-reserve-preset]');
+
+const BUFFER_FACTOR = 0.94;
+const BUFFER_PERCENT = Math.round(BUFFER_FACTOR * 100);
 
 if (scenarioFeedbackEl) {
   scenarioFeedbackEl.dataset.state = 'hidden';
@@ -457,19 +451,11 @@ const metricAnimations = new WeakMap();
 let previousTotalEnergy = 0;
 let previousBufferedEnergy = 0;
 let previousTotalPower = 0;
-let efficiency = 0.9;
-let reserve = 0.85;
-
-const STORAGE_KEY = 'power-calculator-scenario-v3';
+const STORAGE_KEY = 'power-calculator-scenario-v4';
 const categoryPreferences = new Map();
 let pendingCategoryPreferences = null;
 let isRestoringState = false;
 let scenarioFeedbackTimer = null;
-const MIN_EFFICIENCY = 70;
-const MAX_EFFICIENCY = 100;
-const MIN_RESERVE = 60;
-const MAX_RESERVE = 100;
-
 function showSelectedSection() {
   if (!selectedSection) {
     return;
@@ -971,9 +957,12 @@ function createCategorySection(category, index) {
     info.appendChild(textBlock);
     header.appendChild(info);
 
+    const controls = document.createElement('div');
+    controls.className = 'device-card-controls';
+
     const addButton = document.createElement('button');
     addButton.type = 'button';
-    addButton.className = 'device-add';
+    addButton.className = 'device-add device-action';
     addButton.textContent = '+';
     addButton.setAttribute('aria-label', `Додати ${device.name}`);
     addButton.addEventListener('click', (event) => {
@@ -990,13 +979,29 @@ function createCategorySection(category, index) {
       setQuantity(device.id, nextQuantity);
     });
 
-    header.appendChild(addButton);
+    controls.appendChild(addButton);
+
+    let subtractButton = null;
+    if (device.allowQuantity) {
+      subtractButton = document.createElement('button');
+      subtractButton.type = 'button';
+      subtractButton.className = 'device-minus device-action';
+      subtractButton.textContent = '–';
+      subtractButton.setAttribute('aria-label', `Зменшити кількість ${device.name}`);
+      subtractButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        adjustQuantity(device.id, -1);
+      });
+      controls.appendChild(subtractButton);
+    }
+
+    header.appendChild(controls);
     card.appendChild(header);
 
     const input = null;
 
     grid.appendChild(card);
-    cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton });
+    cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton, subtractButton });
   });
 
   content.appendChild(grid);
@@ -1601,59 +1606,6 @@ function renderCategoryBreakdown(categoryEnergies, totalEnergy) {
   });
 }
 
-function clampPercent(value, min, max) {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) {
-    return min;
-  }
-  return Math.max(min, Math.min(max, Math.round(numeric)));
-}
-
-function updatePresetHighlight(buttons, attribute, target) {
-  buttons.forEach((button) => {
-    const raw = button.getAttribute(attribute);
-    const numeric = Number(raw);
-    if (!Number.isFinite(numeric)) {
-      button.classList.remove('active');
-      return;
-    }
-    const presetValue = Math.round(numeric);
-    button.classList.toggle('active', presetValue === target);
-  });
-}
-
-function setEfficiencyPercent(percent, { syncRange = true } = {}) {
-  const nextValue = clampPercent(percent, MIN_EFFICIENCY, MAX_EFFICIENCY);
-  const changed = Math.round(efficiency * 100) !== nextValue;
-  efficiency = nextValue / 100;
-
-  if (efficiencyRange && syncRange && efficiencyRange.value !== String(nextValue)) {
-    efficiencyRange.value = String(nextValue);
-  }
-  if (efficiencyOutput) {
-    efficiencyOutput.textContent = `${nextValue}%`;
-  }
-  updatePresetHighlight(effPresetButtons, 'data-eff-preset', nextValue);
-
-  return changed;
-}
-
-function setReservePercent(percent, { syncRange = true } = {}) {
-  const nextValue = clampPercent(percent, MIN_RESERVE, MAX_RESERVE);
-  const changed = Math.round(reserve * 100) !== nextValue;
-  reserve = nextValue / 100;
-
-  if (reserveRange && syncRange && reserveRange.value !== String(nextValue)) {
-    reserveRange.value = String(nextValue);
-  }
-  if (reserveOutput) {
-    reserveOutput.textContent = `${nextValue}%`;
-  }
-  updatePresetHighlight(reservePresetButtons, 'data-reserve-preset', nextValue);
-
-  return changed;
-}
-
 function showScenarioMessage(message, type = 'info') {
   if (!scenarioFeedbackEl) {
     return;
@@ -1698,10 +1650,8 @@ function serializeState() {
   });
 
   return {
-    version: 3,
+    version: 4,
     devices: devicesData,
-    efficiency: Math.round(efficiency * 100),
-    reserve: Math.round(reserve * 100),
     categories
   };
 }
@@ -1813,13 +1763,6 @@ function applySerializedState(serialized, { announce = false } = {}) {
       }
     });
 
-    if (typeof serialized.efficiency === 'number') {
-      setEfficiencyPercent(serialized.efficiency);
-    }
-    if (typeof serialized.reserve === 'number') {
-      setReservePercent(serialized.reserve);
-    }
-
     if (serialized.categories && typeof serialized.categories === 'object') {
       categoryPreferences.clear();
       const map = new Map();
@@ -1847,8 +1790,6 @@ function resetScenario() {
     state.forEach((device) => {
       resetDeviceToBaseline(device);
     });
-    setEfficiencyPercent(90);
-    setReservePercent(85);
     categoryPreferences.clear();
     pendingCategoryPreferences = null;
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -1861,46 +1802,6 @@ function resetScenario() {
   applyCategoryExpansionPreferences();
   updateInterface();
   showScenarioMessage('Сценарій очищено.', 'success');
-}
-
-function exportScenario() {
-  try {
-    const payload = serializeState();
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `power-scenario-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showScenarioMessage('Файл сценарію збережено.', 'success');
-  } catch (error) {
-    console.warn('Не вдалося експортувати сценарій', error);
-    showScenarioMessage('Не вдалося експортувати сценарій.', 'error');
-  }
-}
-
-function handleScenarioFileSelection(event) {
-  const file = event.target?.files?.[0];
-  if (!file) {
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (loadEvent) => {
-    try {
-      const text = String(loadEvent.target?.result || '');
-      const data = JSON.parse(text);
-      applySerializedState(data, { announce: true });
-    } catch (error) {
-      console.warn('Не вдалося імпортувати сценарій', error);
-      showScenarioMessage('Не вдалося імпортувати файл. Перевірте формат JSON.', 'error');
-    }
-  };
-  reader.readAsText(file, 'utf-8');
-  event.target.value = '';
 }
 
 function encodeScenarioForUrl(data) {
@@ -2016,50 +1917,6 @@ function loadScenarioFromQuery() {
 }
 
 function initializeScenarioControls() {
-  if (efficiencyRange) {
-    efficiencyRange.addEventListener('input', (event) => {
-      setEfficiencyPercent(event.target.value, { syncRange: false });
-      updateInterface();
-    });
-    efficiencyRange.addEventListener('change', (event) => {
-      setEfficiencyPercent(event.target.value);
-      updateInterface();
-    });
-  }
-
-  if (reserveRange) {
-    reserveRange.addEventListener('input', (event) => {
-      setReservePercent(event.target.value, { syncRange: false });
-      updateInterface();
-    });
-    reserveRange.addEventListener('change', (event) => {
-      setReservePercent(event.target.value);
-      updateInterface();
-    });
-  }
-
-  effPresetButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const value = Number(button.getAttribute('data-eff-preset'));
-      if (!Number.isFinite(value)) {
-        return;
-      }
-      setEfficiencyPercent(value);
-      updateInterface();
-    });
-  });
-
-  reservePresetButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const value = Number(button.getAttribute('data-reserve-preset'));
-      if (!Number.isFinite(value)) {
-        return;
-      }
-      setReservePercent(value);
-      updateInterface();
-    });
-  });
-
   if (saveScenarioBtn) {
     saveScenarioBtn.addEventListener('click', () => {
       persistState(true);
@@ -2071,22 +1928,6 @@ function initializeScenarioControls() {
     resetScenarioBtn.addEventListener('click', () => {
       resetScenario();
     });
-  }
-
-  if (exportScenarioBtn) {
-    exportScenarioBtn.addEventListener('click', () => {
-      exportScenario();
-    });
-  }
-
-  if (importScenarioBtn) {
-    importScenarioBtn.addEventListener('click', () => {
-      scenarioFileInput?.click();
-    });
-  }
-
-  if (scenarioFileInput) {
-    scenarioFileInput.addEventListener('change', handleScenarioFileSelection);
   }
 
   if (shareScenarioBtn) {
@@ -2138,6 +1979,9 @@ function updateInterface() {
           isActive ? `Додати ще ${device.name}` : `Додати ${device.name}`
         );
         cardMeta.addButton.toggleAttribute('disabled', device.quantity >= device.maxQuantity);
+        if (cardMeta.subtractButton) {
+          cardMeta.subtractButton.toggleAttribute('disabled', device.quantity <= 0);
+        }
       } else {
         cardMeta.addButton.textContent = isActive ? '✓' : '+';
         cardMeta.addButton.setAttribute(
@@ -2145,6 +1989,9 @@ function updateInterface() {
           isActive ? `Прибрати ${device.name}` : `Додати ${device.name}`
         );
         cardMeta.addButton.removeAttribute('disabled');
+        if (cardMeta.subtractButton) {
+          cardMeta.subtractButton.toggleAttribute('disabled', true);
+        }
       }
     }
   });
@@ -2162,7 +2009,7 @@ function updateInterface() {
   });
 
   totalEnergy = Math.round(totalEnergy * 10) / 10;
-  const combinedFactor = Math.max(0.01, efficiency * reserve);
+  const combinedFactor = Math.max(0.01, BUFFER_FACTOR);
   const bufferedEnergy = totalEnergy > 0 ? Math.round((totalEnergy / combinedFactor) * 10) / 10 : 0;
 
   const energyDigits = Number.isInteger(totalEnergy) ? 0 : 1;
@@ -2177,10 +2024,8 @@ function updateInterface() {
   previousBufferedEnergy = bufferedEnergy;
   previousTotalPower = totalPowerRounded;
 
-  const effPercent = Math.round(efficiency * 100);
-  const reservePercent = Math.round(reserve * 100);
   if (bufferHelperEl) {
-    bufferHelperEl.textContent = `ККД: ${effPercent}% · Резерв батареї: ${reservePercent}% · Запас енергії на випадок втрат та захисту акумулятора.`;
+    bufferHelperEl.textContent = `Враховано сумарний ККД інвертора та резерв батареї (${BUFFER_PERCENT}%).`;
   }
 
   renderCategoryBreakdown(categoryEnergies, totalEnergy);
@@ -2191,9 +2036,6 @@ function updateInterface() {
 
   persistState();
 }
-
-setEfficiencyPercent(Math.round(efficiency * 100));
-setReservePercent(Math.round(reserve * 100));
 
 const loadedFromQuery = loadScenarioFromQuery();
 if (!loadedFromQuery) {

@@ -38,38 +38,19 @@
         <div class="tuning-grid">
           <article class="tuning-card">
             <header>
-              <h3>ККД інвертора</h3>
-              <span class="tuning-value" id="efficiency-output">90%</span>
+              <h3>ККД та резерв батареї</h3>
+              <span class="tuning-value" aria-label="Сумарний ККД та резерв батареї">94%</span>
             </header>
-            <p>Оберіть ефективність перетворення змінного струму.</p>
-            <input type="range" id="efficiency-range" min="70" max="100" step="1" value="90" aria-label="ККД інвертора, %" />
-            <div class="tuning-presets" role="group" aria-label="Швидкі значення ККД">
-              <button type="button" data-eff-preset="85">85%</button>
-              <button type="button" data-eff-preset="90" class="active">90%</button>
-              <button type="button" data-eff-preset="95">95%</button>
-            </div>
-          </article>
-          <article class="tuning-card">
-            <header>
-              <h3>Резерв батареї (DoD)</h3>
-              <span class="tuning-value" id="reserve-output">85%</span>
-            </header>
-            <p>Оберіть допустиму глибину розрядження акумулятора.</p>
-            <input type="range" id="reserve-range" min="60" max="100" step="1" value="85" aria-label="Резерв батареї, %" />
-            <div class="tuning-presets" role="group" aria-label="Швидкі значення резерву">
-              <button type="button" data-reserve-preset="70">70%</button>
-              <button type="button" data-reserve-preset="80">80%</button>
-              <button type="button" data-reserve-preset="85" class="active">85%</button>
-            </div>
+            <p>
+              Усі розрахунки враховують сумарний ККД інвертора та резерв батареї. Статичне значення 94% поєднує втрати на
+              перетворення та допустимий запас ємності.
+            </p>
           </article>
         </div>
         <div class="scenario-actions">
-          <button type="button" id="save-scenario" class="scenario-button">Зберегти локально</button>
-          <button type="button" id="reset-scenario" class="scenario-button subtle">Очистити</button>
-          <button type="button" id="export-scenario" class="scenario-button">Експорт JSON</button>
-          <button type="button" id="import-scenario" class="scenario-button">Імпорт JSON</button>
+          <button type="button" id="save-scenario" class="scenario-button">Зберегти конфігурацію</button>
+          <button type="button" id="reset-scenario" class="scenario-button subtle">Очистити конфігурацію</button>
           <button type="button" id="share-scenario" class="scenario-button highlight">Поділитися конфігурацією</button>
-          <input type="file" id="scenario-file" accept="application/json" hidden />
         </div>
         <p class="scenario-feedback" id="scenario-feedback" role="status" aria-live="polite"></p>
       </section>
@@ -103,10 +84,10 @@
           <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
         </article>
         <article class="summary-card">
-          <h3>Споживання з урахуванням втрат</h3>
+          <h3>Споживання з урахуванням ККД та резерву</h3>
           <p class="summary-value" id="total-buffered">0 Wh</p>
           <p class="summary-helper" id="buffer-helper">
-            ККД: 90% · Резерв батареї: 85% · Запас енергії на випадок втрат та захисту акумулятора.
+            Враховано сумарний ККД інвертора та резерв батареї (94%).
           </p>
         </article>
         <article class="summary-card">

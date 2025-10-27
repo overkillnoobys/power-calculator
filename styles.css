@@ -11,6 +11,7 @@
   --border: rgba(139, 92, 246, 0.3);
   --success: #34d399;
   --warning: #f97316;
+  --danger: #f87171;
   font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -206,6 +207,13 @@ h1 {
   width: 100%;
 }
 
+.device-card-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
 .device-card-info {
   display: flex;
   gap: 0.45rem;
@@ -247,7 +255,7 @@ h1 {
   height: 100%;
 }
 
-.device-add {
+.device-action {
   width: 28px;
   height: 28px;
   border-radius: 9px;
@@ -256,19 +264,22 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(139, 92, 246, 0.18);
-  color: var(--accent-strong);
   border: 1px solid transparent;
-  transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease, color 0.2s ease;
 }
 
-.device-add:hover {
+.device-action:hover {
   background: rgba(139, 92, 246, 0.3);
   transform: translateY(-1px);
 }
 
-.device-add:active {
+.device-action:active {
   transform: translateY(0) scale(0.98);
+}
+
+.device-add {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--accent-strong);
 }
 
 .device-card.active .device-add {
@@ -288,10 +299,25 @@ h1 {
   opacity: 1;
 }
 
-.device-add[disabled] {
+.device-minus {
+  background: rgba(248, 113, 113, 0.16);
+  color: var(--danger);
+}
+
+.device-minus:hover {
+  background: rgba(248, 113, 113, 0.28);
+}
+
+.device-card.active .device-minus {
+  background: rgba(248, 113, 113, 0.24);
+}
+
+.device-action[disabled] {
   opacity: 0.35;
   cursor: not-allowed;
   transform: none;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--muted);
 }
 
 .variant-selector {
@@ -480,40 +506,6 @@ h1 {
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
-}
-
-.tuning-card input[type='range'] {
-  width: 100%;
-  accent-color: rgba(139, 92, 246, 0.9);
-}
-
-.tuning-presets {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tuning-presets button {
-  border-radius: 999px;
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  background: transparent;
-  color: var(--muted);
-  padding: 0.35rem 0.75rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
-}
-
-.tuning-presets button:hover {
-  background: rgba(139, 92, 246, 0.2);
-  color: var(--text);
-}
-
-.tuning-presets button.active {
-  background: rgba(139, 92, 246, 0.25);
-  border-color: rgba(139, 92, 246, 0.8);
-  color: var(--text);
 }
 
 .scenario-actions {
