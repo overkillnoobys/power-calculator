@@ -1,4 +1,5 @@
-:root {
+:root,
+.power-calculator-embed {
   color-scheme: dark;
   --bg: #0f0b1f;
   --panel: rgba(36, 24, 68, 0.7);
@@ -12,11 +13,15 @@
   --success: #34d399;
   --warning: #f97316;
   --danger: #f87171;
-  font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+body,
+.power-calculator-embed {
+  font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 body {
@@ -31,6 +36,21 @@ body {
   overflow-x: hidden;
 }
 
+.power-calculator-embed {
+  position: relative;
+  display: block;
+  color: var(--text);
+  background: radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.18), transparent 60%),
+    radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.14), transparent 55%),
+    linear-gradient(180deg, rgba(19, 13, 39, 0.88), rgba(15, 11, 31, 0.94));
+  border-radius: 32px;
+  box-shadow: 0 40px 120px rgba(11, 6, 28, 0.65);
+  overflow: hidden;
+  isolation: isolate;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
 .background-glow {
   position: fixed;
   inset: 0;
@@ -41,11 +61,21 @@ body {
   opacity: 0.7;
 }
 
+.power-calculator-embed > .background-glow {
+  position: absolute;
+}
+
+.power-calculator-embed .app-shell {
+  position: relative;
+  z-index: 1;
+}
+
 .app-shell {
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
   padding: 4rem 1.5rem 3rem;
+  color: var(--text);
 }
 
 .app-header {
