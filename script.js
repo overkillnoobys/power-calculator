@@ -462,7 +462,9 @@ const stations = [
 ];
 
 stations.forEach((station) => {
-  station.image = createStationIllustration(station);
+  if (!station.image) {
+    station.image = createStationIllustration(station);
+  }
 });
 
 const state = new Map(
