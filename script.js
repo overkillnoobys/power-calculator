@@ -929,8 +929,7 @@ function createCategorySection(category, index) {
 
     const pill = document.createElement('span');
     pill.className = 'device-quantity-pill';
-    pill.textContent = 'x0';
-    card.appendChild(pill);
+    pill.textContent = device.allowQuantity ? 'x0' : '—';
 
     const header = document.createElement('div');
     header.className = 'device-card-header';
@@ -980,6 +979,7 @@ function createCategorySection(category, index) {
       setQuantity(device.id, nextQuantity);
     });
 
+    controls.appendChild(pill);
     controls.appendChild(addButton);
 
     let subtractButton = null;
