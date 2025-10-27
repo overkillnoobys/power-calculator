@@ -388,7 +388,7 @@ const stations = [
     capacityWh: 2700,
     powerW: 3800,
     link: 'https://martin-shop.online/shop/zaryadna-stantsiya-bluetti-apex-300-2700wh-750000mah-3800w/',
-    image: 'https://martin-shop.online/uploads/stations/apex-300.webp'
+    image: 'https://martin-shop.online/Media/shop-32497/_imports/powerstation/Bluetti4/PB931453img.jpg'
   },
   {
     name: 'Bluetti AC180',
