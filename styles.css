@@ -502,7 +502,7 @@ h1 {
 .scenario-toolbar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 1rem;
   padding: 1rem 0 0.5rem;
 }
@@ -510,22 +510,23 @@ h1 {
 .scenario-actions {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
   background: rgba(20, 11, 36, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.25);
-  padding: 0.35rem 0.6rem;
+  padding: 0.45rem 0.8rem;
   border-radius: 999px;
   backdrop-filter: blur(12px);
 }
 
 .scenario-button {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.95rem;
+  justify-content: flex-start;
+  padding: 0 0.9rem 0 0.75rem;
+  position: relative;
   border: 1px solid transparent;
   background: rgba(18, 9, 33, 0.9);
   color: var(--text);
@@ -535,6 +536,36 @@ h1 {
     transform var(--transition-fast) var(--ease-snappy),
     border var(--transition-fast) var(--ease-snappy),
     box-shadow var(--transition-medium) var(--ease-soft);
+}
+
+.scenario-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scenario-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .scenario-button:hover {
@@ -563,6 +594,8 @@ h1 {
   font-size: 0.9rem;
   color: var(--muted);
   min-height: 1.2rem;
+  flex: 1;
+  text-align: right;
   transition: opacity var(--transition-fast) var(--ease-soft);
 }
 
@@ -1485,11 +1518,6 @@ tbody td {
     width: 100%;
   }
 
-  .scenario-toolbar {
-    justify-content: center;
-  }
-
-  
 }
 
 @media (max-width: 640px) {
@@ -1497,19 +1525,16 @@ tbody td {
     padding: 1.1rem 1rem 1.2rem;
   }
 
-  .scenario-toolbar {
-    justify-content: center;
-  }
-
   .scenario-actions {
-    padding: 0.32rem 0.5rem;
-    gap: 0.5rem;
+    padding: 0.35rem 0.55rem;
+    gap: 0.45rem;
   }
 
   .scenario-button {
-    width: 32px;
-    height: 32px;
-    font-size: 0.82rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    padding: 0 0.7rem 0 0.6rem;
   }
 
   .breakdown {
