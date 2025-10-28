@@ -1563,7 +1563,13 @@ function createCategorySection(category, index) {
     let quantityDisplay = null;
     let quantityButton = null;
     let quantityMenu = null;
-    let toggleButton = null;
+    let addButton = null;
+
+    addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'device-add-button';
+    addButton.textContent = '+';
+    addButton.setAttribute('aria-label', `Додати ${device.name}`);
 
     if (device.allowQuantity) {
       quantityButton = document.createElement('button');
@@ -1609,27 +1615,34 @@ function createCategorySection(category, index) {
         event.stopPropagation();
       });
       card.appendChild(quantityMenu);
+
+      addButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const current = state.get(device.id);
+        const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
+        if (base <= 0) {
+          setQuantity(device.id, 1);
+        }
+        openQuantityMenuFor(device.id);
+      });
     } else {
       const pill = document.createElement('span');
       pill.className = 'device-quantity-pill';
       pill.textContent = '—';
       quantityDisplay = pill;
+      pill.hidden = true;
       controls.appendChild(pill);
 
-      toggleButton = document.createElement('button');
-      toggleButton.type = 'button';
-      toggleButton.className = 'device-toggle-button';
-      toggleButton.textContent = '+';
-      toggleButton.setAttribute('aria-label', `Додати ${device.name}`);
-      toggleButton.addEventListener('click', (event) => {
+      addButton.addEventListener('click', (event) => {
         event.stopPropagation();
         const current = state.get(device.id);
         const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
         const next = base > 0 ? 0 : 1;
         setQuantity(device.id, next);
       });
-      controls.appendChild(toggleButton);
     }
+
+    controls.appendChild(addButton);
 
     header.appendChild(controls);
     card.appendChild(header);
@@ -1641,7 +1654,7 @@ function createCategorySection(category, index) {
       quantityDisplay,
       quantityButton,
       quantityMenu,
-      toggleButton
+      addButton
     });
 
     const currentState = state.get(device.id);
@@ -1654,6 +1667,20 @@ function createCategorySection(category, index) {
       quantityButton.classList.toggle('selected', isActive);
       if (quantityDisplay) {
         quantityDisplay.textContent = isActive ? String(baseQuantity) : '—';
+      }
+    }
+
+    if (addButton) {
+      const isActive = baseQuantity > 0;
+      addButton.hidden = isActive;
+      addButton.setAttribute('aria-hidden', isActive ? 'true' : 'false');
+      addButton.tabIndex = isActive ? -1 : 0;
+    }
+
+    if (quantityDisplay && !device.allowQuantity) {
+      quantityDisplay.hidden = baseQuantity <= 0;
+      if (baseQuantity > 0) {
+        quantityDisplay.textContent = '✓';
       }
     }
 
@@ -3050,9 +3077,18 @@ function updateInterface() {
       );
 
       if (cardMeta.quantityDisplay) {
-        cardMeta.quantityDisplay.textContent = device.allowQuantity
-          ? (isActive ? String(device.quantity) : '—')
-          : (isActive ? '1' : '—');
+        if (device.allowQuantity) {
+          cardMeta.quantityDisplay.textContent = isActive ? String(device.quantity) : '—';
+        } else {
+          cardMeta.quantityDisplay.textContent = isActive ? '✓' : '—';
+          cardMeta.quantityDisplay.hidden = !isActive;
+        }
+      }
+
+      if (cardMeta.addButton) {
+        cardMeta.addButton.hidden = isActive;
+        cardMeta.addButton.setAttribute('aria-hidden', isActive ? 'true' : 'false');
+        cardMeta.addButton.tabIndex = isActive ? -1 : 0;
       }
 
       if (cardMeta.quantityButton) {
@@ -3086,14 +3122,6 @@ function updateInterface() {
         cardMeta.quantityMenu.classList.remove('open');
         cardMeta.quantityMenu.hidden = true;
         unmountQuantityMenu(cardMeta);
-      }
-
-      if (cardMeta.toggleButton) {
-        cardMeta.toggleButton.textContent = isActive ? '✓' : '+';
-        cardMeta.toggleButton.setAttribute(
-          'aria-label',
-          isActive ? `Прибрати ${device.name}` : `Додати ${device.name}`
-        );
       }
 
       cardMeta.meta.textContent = getDeviceMetaText(device);

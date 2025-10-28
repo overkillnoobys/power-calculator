@@ -316,7 +316,7 @@ h1 {
   height: 100%;
 }
 
-.device-toggle-button {
+.device-add-button {
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -337,16 +337,16 @@ h1 {
     border var(--transition-fast) var(--ease-snappy);
 }
 
-.device-toggle-button:hover {
+.device-add-button:hover {
   background: rgba(139, 92, 246, 0.26);
   transform: translateY(-1px);
 }
 
-.device-toggle-button:active {
+.device-add-button:active {
   transform: translateY(0) scale(0.96);
 }
 
-.device-card.active .device-toggle-button {
+.device-card.active .device-add-button {
   background: rgba(139, 92, 246, 0.34);
   border-color: rgba(139, 92, 246, 0.55);
   color: var(--text);
@@ -391,7 +391,7 @@ h1 {
   border-color: rgba(139, 92, 246, 0.65);
 }
 
-.device-toggle-button:focus-visible,
+.device-add-button:focus-visible,
 .device-quantity-button:focus-visible,
 .device-quantity-option:focus-visible {
   outline: 2px solid rgba(139, 92, 246, 0.55);
