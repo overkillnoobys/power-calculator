@@ -263,6 +263,16 @@ const iconDefinitions = {
       { tag: 'line', attrs: { x1: '14', y1: '20', x2: '14', y2: '21.5' } }
     ]
   },
+  'gas-boiler': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '7', y: '3.5', width: '10', height: '17', rx: '1.8' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '7.5', r: '0.7', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'path', attrs: { d: 'M12 11.2l1.2 1.7c.6.8.6 1.9-.1 2.6-.5.6-1.5.6-2 0-.7-.7-.7-1.8-.1-2.6Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '10', y1: '20.5', x2: '10', y2: '22' } },
+      { tag: 'line', attrs: { x1: '14', y1: '20.5', x2: '14', y2: '22' } }
+    ]
+  },
   'space-heater': {
     viewBox: '0 0 24 24',
     elements: [
