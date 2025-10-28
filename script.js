@@ -1570,6 +1570,7 @@ function createCategorySection(category, index) {
     addButton.className = 'device-add-button';
     addButton.textContent = '+';
     addButton.setAttribute('aria-label', `Додати ${device.name}`);
+    addButton.setAttribute('aria-pressed', 'false');
 
     if (device.allowQuantity) {
       quantityButton = document.createElement('button');
@@ -1588,7 +1589,9 @@ function createCategorySection(category, index) {
 
       quantityButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        toggleQuantityMenuFor(device.id);
+        if (state.get(device.id)?.quantity > 0) {
+          toggleQuantityMenuFor(device.id);
+        }
       });
 
       controls.appendChild(quantityButton);
@@ -1607,10 +1610,8 @@ function createCategorySection(category, index) {
         event.stopPropagation();
         const current = state.get(device.id);
         const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
-        if (base <= 0) {
-          setQuantity(device.id, 1);
-        }
-        openQuantityMenuFor(device.id);
+        const next = base > 0 ? 0 : 1;
+        setQuantity(device.id, next);
       });
     } else {
       const pill = document.createElement('span');
@@ -1659,9 +1660,11 @@ function createCategorySection(category, index) {
 
     if (addButton) {
       const isActive = baseQuantity > 0;
-      addButton.hidden = isActive;
-      addButton.setAttribute('aria-hidden', isActive ? 'true' : 'false');
-      addButton.tabIndex = isActive ? -1 : 0;
+      addButton.hidden = false;
+      addButton.setAttribute('aria-hidden', 'false');
+      addButton.tabIndex = 0;
+      addButton.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      addButton.setAttribute('aria-label', isActive ? `Прибрати ${device.name}` : `Додати ${device.name}`);
     }
 
     if (quantityDisplay && !device.allowQuantity) {
@@ -1684,16 +1687,11 @@ function createCategorySection(category, index) {
 
       const current = state.get(device.id);
       const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
-      if (device.allowQuantity) {
-        if (base <= 0) {
-          setQuantity(device.id, 1);
-        }
-        openQuantityMenuFor(device.id);
-        return;
+      if (base > 0) {
+        setQuantity(device.id, 0);
+      } else {
+        setQuantity(device.id, 1);
       }
-
-      const next = base > 0 ? 0 : 1;
-      setQuantity(device.id, next);
     });
 
     card.addEventListener('keydown', (event) => {
@@ -3073,9 +3071,14 @@ function updateInterface() {
       }
 
       if (cardMeta.addButton) {
-        cardMeta.addButton.hidden = isActive;
-        cardMeta.addButton.setAttribute('aria-hidden', isActive ? 'true' : 'false');
-        cardMeta.addButton.tabIndex = isActive ? -1 : 0;
+        cardMeta.addButton.hidden = false;
+        cardMeta.addButton.setAttribute('aria-hidden', 'false');
+        cardMeta.addButton.tabIndex = 0;
+        cardMeta.addButton.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        cardMeta.addButton.setAttribute(
+          'aria-label',
+          isActive ? `Прибрати ${device.name}` : `Додати ${device.name}`
+        );
       }
 
       if (cardMeta.quantityButton) {
