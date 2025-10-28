@@ -410,9 +410,6 @@ h1 {
 
 .device-quantity-menu {
   position: absolute;
-  top: 100%;
-  right: 0.45rem;
-  margin-top: 0.35rem;
   min-width: 150px;
   border-radius: 12px;
   border: 1px solid rgba(139, 92, 246, 0.35);
@@ -421,17 +418,56 @@ h1 {
   padding: 0.45rem 0;
   opacity: 0;
   transform: translateY(-8px) scale(0.96);
+  transform-origin: top right;
   pointer-events: none;
   transition:
     opacity var(--transition-medium) var(--ease-soft),
     transform var(--transition-medium) var(--ease-soft);
-  z-index: 15;
+  z-index: 50;
+}
+
+.device-quantity-menu[data-position='above'] {
+  transform: translateY(8px) scale(0.96);
+}
+
+.device-quantity-menu[data-align='left'] {
+  transform-origin: top left;
+}
+
+.device-quantity-menu[data-align='right'] {
+  transform-origin: top right;
+}
+
+.device-quantity-menu[data-align='center'] {
+  transform-origin: top center;
+}
+
+.device-quantity-menu[data-position='above'][data-align='left'] {
+  transform-origin: bottom left;
+}
+
+.device-quantity-menu[data-position='above'][data-align='center'] {
+  transform-origin: bottom center;
+}
+
+.device-quantity-menu[data-position='above'][data-align='right'] {
+  transform-origin: bottom right;
+}
+
+.device-quantity-menu[data-position='above']:not([data-align]) {
+  transform-origin: bottom right;
 }
 
 .device-quantity-menu.open {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+}
+
+#quantity-menu-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
 }
 
 .device-quantity-menu-header {
@@ -1016,7 +1052,7 @@ tbody td {
   transition:
     opacity var(--transition-fast) var(--ease-soft),
     transform var(--transition-fast) var(--ease-soft);
-  z-index: 3;
+  z-index: 60;
 }
 
 .info-tooltip::before {
@@ -1031,6 +1067,17 @@ tbody td {
   border-left: 1px solid rgba(139, 92, 246, 0.3);
   transform: rotate(45deg);
   z-index: -1;
+}
+
+.info-tooltip[data-align='left']::before {
+  right: auto;
+  left: 24px;
+}
+
+.info-tooltip[data-align='center']::before {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .info-tooltip[data-visible='true'] {
@@ -1365,7 +1412,7 @@ tbody td {
 .share-dialog {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 120;
   display: flex;
   align-items: center;
   justify-content: center;

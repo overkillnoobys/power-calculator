@@ -698,6 +698,9 @@ if (scenarioFeedbackEl) {
 
 const cardRegistry = new Map();
 let openQuantityMenuMeta = null;
+let quantityMenuPortal = null;
+let quantityMenuPositionFrame = null;
+const QUANTITY_MENU_VIEWPORT_PADDING = 12;
 const categoryRegistry = new Map();
 const selectedRowRegistry = new Map();
 const metricAnimations = new WeakMap();
@@ -714,6 +717,7 @@ let shareDialogHideTimer = null;
 let currentShareUrl = '';
 let tooltipVisible = false;
 let tooltipHideTimer = null;
+let tooltipRepositionFrame = null;
 function showSelectedSection() {
   if (!selectedSection) {
     return;
@@ -876,6 +880,178 @@ function getDeviceMetaText(device) {
   return durationText ? `${powerText} • ${durationText}` : powerText;
 }
 
+function ensureQuantityMenuPortal() {
+  if (quantityMenuPortal && document.body.contains(quantityMenuPortal)) {
+    return quantityMenuPortal;
+  }
+
+  quantityMenuPortal = document.getElementById('quantity-menu-portal');
+  if (!quantityMenuPortal) {
+    quantityMenuPortal = document.createElement('div');
+    quantityMenuPortal.id = 'quantity-menu-portal';
+    document.body.appendChild(quantityMenuPortal);
+  }
+
+  return quantityMenuPortal;
+}
+
+function resetQuantityMenuPosition(menu) {
+  if (!menu) {
+    return;
+  }
+
+  menu.style.top = '';
+  menu.style.left = '';
+  menu.style.transformOrigin = '';
+  menu.dataset.position = '';
+  menu.dataset.align = '';
+}
+
+function mountQuantityMenu(meta) {
+  if (!meta?.quantityMenu) {
+    return;
+  }
+
+  const portal = ensureQuantityMenuPortal();
+  const { quantityMenu } = meta;
+
+  if (!portal.contains(quantityMenu)) {
+    portal.appendChild(quantityMenu);
+  }
+
+  resetQuantityMenuPosition(quantityMenu);
+  quantityMenu.hidden = false;
+}
+
+function unmountQuantityMenu(meta) {
+  if (!meta?.quantityMenu || !meta.card) {
+    return;
+  }
+
+  const { quantityMenu, card } = meta;
+
+  if (quantityMenuPortal && quantityMenuPortal.contains(quantityMenu)) {
+    quantityMenuPortal.removeChild(quantityMenu);
+  }
+
+  if (!card.contains(quantityMenu)) {
+    card.appendChild(quantityMenu);
+  }
+
+  resetQuantityMenuPosition(quantityMenu);
+}
+
+function positionQuantityMenu(meta) {
+  if (!meta?.quantityMenu || !meta.quantityButton) {
+    return;
+  }
+
+  const menu = meta.quantityMenu;
+  const button = meta.quantityButton;
+
+  ensureQuantityMenuPortal();
+
+  const previousTransition = menu.style.transition;
+  const previousTransform = menu.style.transform;
+
+  menu.style.transition = 'none';
+  menu.style.transform = 'none';
+  menu.style.top = '0px';
+  menu.style.left = '0px';
+
+  const width = Math.max(menu.offsetWidth, 0);
+  const height = Math.max(menu.offsetHeight, 0);
+
+  menu.style.transition = previousTransition;
+  menu.style.transform = previousTransform;
+
+  const viewportPadding = QUANTITY_MENU_VIEWPORT_PADDING;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const buttonRect = button.getBoundingClientRect();
+
+  let top = Math.round(buttonRect.bottom + 10);
+  let position = 'below';
+
+  if (top + height > viewportHeight - viewportPadding) {
+    const alternativeTop = Math.round(buttonRect.top - height - 10);
+    if (alternativeTop >= viewportPadding) {
+      top = alternativeTop;
+      position = 'above';
+    } else {
+      top = Math.max(viewportPadding, viewportHeight - height - viewportPadding);
+    }
+  }
+
+  let left = Math.round(buttonRect.right - width);
+  let align = 'right';
+
+  if (width >= viewportWidth - viewportPadding * 2) {
+    left = viewportPadding;
+    align = 'center';
+  } else {
+    if (left < viewportPadding) {
+      left = Math.max(viewportPadding, Math.round(buttonRect.left));
+      align = 'left';
+    }
+
+    if (left + width > viewportWidth - viewportPadding) {
+      left = viewportWidth - width - viewportPadding;
+      align = 'right';
+    }
+
+    const anchorCenter = buttonRect.left + buttonRect.width / 2;
+    if (anchorCenter >= left && anchorCenter <= left + width) {
+      align = 'center';
+    }
+  }
+
+  menu.dataset.position = position;
+  menu.dataset.align = align;
+
+  switch (`${position}-${align}`) {
+    case 'above-left':
+      menu.style.transformOrigin = 'bottom left';
+      break;
+    case 'above-center':
+      menu.style.transformOrigin = 'bottom center';
+      break;
+    case 'above-right':
+      menu.style.transformOrigin = 'bottom right';
+      break;
+    case 'below-left':
+      menu.style.transformOrigin = 'top left';
+      break;
+    case 'below-center':
+      menu.style.transformOrigin = 'top center';
+      break;
+    default:
+      menu.style.transformOrigin = 'top right';
+      break;
+  }
+
+  menu.style.top = `${top}px`;
+  menu.style.left = `${left}px`;
+}
+
+function scheduleQuantityMenuReposition() {
+  if (!openQuantityMenuMeta) {
+    return;
+  }
+
+  if (quantityMenuPositionFrame !== null) {
+    window.cancelAnimationFrame(quantityMenuPositionFrame);
+    quantityMenuPositionFrame = null;
+  }
+
+  quantityMenuPositionFrame = window.requestAnimationFrame(() => {
+    quantityMenuPositionFrame = null;
+    if (openQuantityMenuMeta) {
+      positionQuantityMenu(openQuantityMenuMeta);
+    }
+  });
+}
+
 function setQuantity(id, quantity) {
   const device = state.get(id);
   if (!device) return;
@@ -945,12 +1121,15 @@ function openQuantityMenuFor(id) {
 
   const container = meta.card.closest('.category-content');
 
-  meta.quantityMenu.hidden = false;
+  mountQuantityMenu(meta);
+  positionQuantityMenu(meta);
+
   meta.card.classList.add('menu-open');
   if (container instanceof HTMLElement) {
     container.classList.add('menu-open');
   }
   requestAnimationFrame(() => {
+    positionQuantityMenu(meta);
     meta.quantityMenu.classList.add('open');
     const selectedOption = meta.quantityMenu.querySelector('.device-quantity-option.active');
     if (selectedOption instanceof HTMLElement) {
@@ -968,6 +1147,8 @@ function openQuantityMenuFor(id) {
     card: meta.card,
     container: container instanceof HTMLElement ? container : null
   };
+
+  scheduleQuantityMenuReposition();
 }
 
 function closeQuantityMenu({ immediate = false } = {}) {
@@ -977,6 +1158,11 @@ function closeQuantityMenu({ immediate = false } = {}) {
 
   const { menu, button, card, container } = openQuantityMenuMeta;
   openQuantityMenuMeta = null;
+
+  if (quantityMenuPositionFrame !== null) {
+    window.cancelAnimationFrame(quantityMenuPositionFrame);
+    quantityMenuPositionFrame = null;
+  }
 
   button.classList.remove('open');
   button.setAttribute('aria-expanded', 'false');
@@ -988,6 +1174,7 @@ function closeQuantityMenu({ immediate = false } = {}) {
   }
 
   const finalize = () => {
+    unmountQuantityMenu({ quantityMenu: menu, card });
     menu.hidden = true;
     menu.removeEventListener('transitionend', finalize);
   };
@@ -1050,6 +1237,15 @@ function populateQuantityMenu(menu, device) {
 
   menu.appendChild(list);
   menu.scrollTop = 0;
+  scheduleQuantityMenuReposition();
+}
+
+    finalize();
+    return;
+  }
+
+  menu.classList.remove('open');
+  menu.addEventListener('transitionend', finalize, { once: true });
 }
 
 function setTimeValue(id, value) {
@@ -2512,6 +2708,76 @@ async function handleShareScenario() {
   }
 }
 
+function positionInfoTooltipElement() {
+  if (!infoTooltipEl) {
+    return;
+  }
+
+  const padding = 12;
+  const viewportWidth = window.innerWidth;
+
+  infoTooltipEl.style.left = '';
+  infoTooltipEl.style.right = '0';
+  infoTooltipEl.style.width = '';
+  infoTooltipEl.dataset.align = '';
+
+  const previousTransition = infoTooltipEl.style.transition;
+  const previousTransform = infoTooltipEl.style.transform;
+  infoTooltipEl.style.transition = 'none';
+  infoTooltipEl.style.transform = 'none';
+
+  const rect = infoTooltipEl.getBoundingClientRect();
+  const availableWidth = viewportWidth - padding * 2;
+
+  if (rect.width > availableWidth) {
+    infoTooltipEl.style.left = `${padding}px`;
+    infoTooltipEl.style.right = 'auto';
+    infoTooltipEl.style.width = `calc(100vw - ${padding * 2}px)`;
+    infoTooltipEl.dataset.align = 'center';
+    infoTooltipEl.style.transition = previousTransition;
+    infoTooltipEl.style.transform = previousTransform;
+    return;
+  }
+
+  const overflowRight = rect.right - (viewportWidth - padding);
+  const overflowLeft = padding - rect.left;
+
+  if (overflowLeft > 0 && overflowLeft >= overflowRight) {
+    infoTooltipEl.style.left = `${overflowLeft}px`;
+    infoTooltipEl.style.right = 'auto';
+    infoTooltipEl.dataset.align = 'left';
+    infoTooltipEl.style.transition = previousTransition;
+    infoTooltipEl.style.transform = previousTransform;
+    return;
+  }
+
+  if (overflowRight > 0) {
+    infoTooltipEl.style.right = `${overflowRight}px`;
+    infoTooltipEl.dataset.align = 'right';
+  }
+
+  infoTooltipEl.style.transition = previousTransition;
+  infoTooltipEl.style.transform = previousTransform;
+}
+
+function scheduleTooltipReposition() {
+  if (!tooltipVisible || !infoTooltipEl) {
+    return;
+  }
+
+  if (tooltipRepositionFrame !== null) {
+    window.cancelAnimationFrame(tooltipRepositionFrame);
+    tooltipRepositionFrame = null;
+  }
+
+  tooltipRepositionFrame = window.requestAnimationFrame(() => {
+    tooltipRepositionFrame = null;
+    if (tooltipVisible) {
+      positionInfoTooltipElement();
+    }
+  });
+}
+
 function setTooltipVisibility(visible) {
   if (!infoTriggerBtn || !infoTooltipEl) {
     return;
@@ -2525,6 +2791,20 @@ function setTooltipVisibility(visible) {
   infoTooltipEl.dataset.visible = visible ? 'true' : 'false';
   infoTriggerBtn.setAttribute('aria-expanded', visible ? 'true' : 'false');
   infoTooltipEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
+
+  if (visible) {
+    positionInfoTooltipElement();
+    scheduleTooltipReposition();
+  } else {
+    infoTooltipEl.style.left = '';
+    infoTooltipEl.style.right = '';
+    infoTooltipEl.style.width = '';
+    infoTooltipEl.dataset.align = '';
+    if (tooltipRepositionFrame !== null) {
+      window.cancelAnimationFrame(tooltipRepositionFrame);
+      tooltipRepositionFrame = null;
+    }
+  }
 }
 
 function scheduleTooltipHide(delay = 120) {
@@ -2725,6 +3005,11 @@ function handleDocumentKeyDown(event) {
   }
 }
 
+function handleViewportMutation() {
+  scheduleQuantityMenuReposition();
+  scheduleTooltipReposition();
+}
+
 function updateInterface() {
   const selectedDevices = [];
   let totalPower = 0;
@@ -2787,9 +3072,11 @@ function updateInterface() {
         openQuantityMenuMeta.deviceId === device.id
       ) {
         populateQuantityMenu(cardMeta.quantityMenu, device);
+        scheduleQuantityMenuReposition();
       } else if (cardMeta.quantityMenu && !isActive) {
         cardMeta.quantityMenu.classList.remove('open');
         cardMeta.quantityMenu.hidden = true;
+        unmountQuantityMenu(cardMeta);
       }
 
       if (cardMeta.toggleButton) {
@@ -2803,6 +3090,10 @@ function updateInterface() {
       cardMeta.meta.textContent = getDeviceMetaText(device);
     }
   });
+
+  if (openQuantityMenuMeta) {
+    scheduleQuantityMenuReposition();
+  }
 
   if (selectedDevices.length > 0) {
     showSelectedSection();
@@ -2856,4 +3147,7 @@ initializeShareDialog();
 initializeInfoTooltip();
 document.addEventListener('pointerdown', handleDocumentPointerDown);
 document.addEventListener('keydown', handleDocumentKeyDown);
+window.addEventListener('resize', handleViewportMutation);
+window.addEventListener('orientationchange', handleViewportMutation);
+document.addEventListener('scroll', handleViewportMutation, true);
 updateInterface();
