@@ -1240,14 +1240,6 @@ function populateQuantityMenu(menu, device) {
   scheduleQuantityMenuReposition();
 }
 
-    finalize();
-    return;
-  }
-
-  menu.classList.remove('open');
-  menu.addEventListener('transitionend', finalize, { once: true });
-}
-
 function setTimeValue(id, value) {
   const device = state.get(id);
   if (!device) return;
