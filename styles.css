@@ -182,10 +182,12 @@ h1 {
 }
 
 .category-content.animating {
+  overflow: hidden;
   transition: height var(--transition-medium) var(--ease-soft);
 }
 
 .category-block.expanded .category-content {
+  overflow: visible;
   padding-bottom: 1.4rem;
 }
 
@@ -200,6 +202,7 @@ h1 {
   gap: 0.45rem;
   grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
 }
+
 
 .device-card {
   position: relative;
@@ -219,6 +222,17 @@ h1 {
   gap: 0.32rem;
   min-height: 86px;
   overflow: visible;
+  z-index: 0;
+}
+
+.device-card:hover,
+.device-card:focus-visible,
+.device-card:focus-within {
+  z-index: 5;
+}
+
+.device-card.menu-open {
+  z-index: 25;
 }
 
 .device-card:hover {

@@ -944,6 +944,7 @@ function openQuantityMenuFor(id) {
   populateQuantityMenu(meta.quantityMenu, device);
 
   meta.quantityMenu.hidden = false;
+  meta.card.classList.add('menu-open');
   requestAnimationFrame(() => {
     meta.quantityMenu.classList.add('open');
     const selectedOption = meta.quantityMenu.querySelector('.device-quantity-option.active');
@@ -958,7 +959,8 @@ function openQuantityMenuFor(id) {
   openQuantityMenuMeta = {
     deviceId: id,
     menu: meta.quantityMenu,
-    button: meta.quantityButton
+    button: meta.quantityButton,
+    card: meta.card
   };
 }
 
@@ -967,11 +969,14 @@ function closeQuantityMenu({ immediate = false } = {}) {
     return;
   }
 
-  const { menu, button } = openQuantityMenuMeta;
+  const { menu, button, card } = openQuantityMenuMeta;
   openQuantityMenuMeta = null;
 
   button.classList.remove('open');
   button.setAttribute('aria-expanded', 'false');
+  if (card) {
+    card.classList.remove('menu-open');
+  }
 
   const finalize = () => {
     menu.hidden = true;
@@ -1551,6 +1556,7 @@ function setCategoryExpanded(category, expanded, { updatePreference = true } = {
   const targetHeight = expanded ? content.scrollHeight : 0;
 
   content.classList.add('animating');
+  content.style.overflow = 'hidden';
   content.style.height = `${startHeight}px`;
 
   requestAnimationFrame(() => {
@@ -1565,10 +1571,19 @@ function setCategoryExpanded(category, expanded, { updatePreference = true } = {
     }
     content.classList.remove('animating');
     content.style.height = expanded ? 'auto' : '0px';
+    content.style.overflow = expanded ? 'visible' : 'hidden';
     content.removeEventListener('transitionend', onTransitionEnd);
   };
 
   content.addEventListener('transitionend', onTransitionEnd);
+
+  if (Math.abs(targetHeight - startHeight) < 0.5) {
+    requestAnimationFrame(() => onTransitionEnd({ target: content }));
+  }
+
+  if (!expanded) {
+    content.style.overflow = 'hidden';
+  }
 
   if (updatePreference) {
     categoryPreferences.set(category, expanded);
@@ -2726,6 +2741,10 @@ function updateInterface() {
       const isActive = device.quantity > 0;
       cardMeta.card.classList.toggle('active', isActive);
       cardMeta.card.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+      cardMeta.card.classList.toggle(
+        'menu-open',
+        Boolean(openQuantityMenuMeta && openQuantityMenuMeta.deviceId === device.id)
+      );
 
       if (cardMeta.quantityDisplay) {
         cardMeta.quantityDisplay.textContent = device.allowQuantity
