@@ -907,6 +907,22 @@ function resetQuantityMenuPosition(menu) {
   menu.dataset.align = '';
 }
 
+function teardownQuantityMenuPortalIfEmpty() {
+  if (!quantityMenuPortal) {
+    return;
+  }
+
+  if (quantityMenuPortal.childElementCount > 0) {
+    return;
+  }
+
+  if (quantityMenuPortal.parentNode) {
+    quantityMenuPortal.parentNode.removeChild(quantityMenuPortal);
+  }
+
+  quantityMenuPortal = null;
+}
+
 function mountQuantityMenu(meta) {
   if (!meta?.quantityMenu) {
     return;
@@ -939,6 +955,7 @@ function unmountQuantityMenu(meta) {
   }
 
   resetQuantityMenuPosition(quantityMenu);
+  teardownQuantityMenuPortalIfEmpty();
 }
 
 function positionQuantityMenu(meta) {
