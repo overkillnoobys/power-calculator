@@ -49,13 +49,14 @@ const devices = [
   { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1.5, icon: 'washer', allowQuantity: false },
   { id: 22, category: 'Велика побутова техніка', name: 'Конвекторні обігрівачі', watts: 1400, hours: 3, icon: 'convector-heater', allowQuantity: false },
   { id: 23, category: 'Велика побутова техніка', name: 'Водонагрівачі', watts: 1500, hours: 2, icon: 'water-heater', allowQuantity: false },
-  { id: 24, category: 'Велика побутова техніка', name: 'Обігрівачі', watts: 1800, hours: 3, icon: 'space-heater', allowQuantity: false },
-  { id: 25, category: 'Велика побутова техніка', name: 'Тепловентилятори', watts: 1200, hours: 2, icon: 'fan-heater', allowQuantity: false },
-  { id: 26, category: 'Велика побутова техніка', name: 'Плити', watts: 1800, hours: 1, icon: 'cooktop', allowQuantity: false },
-  { id: 27, category: 'Велика побутова техніка', name: 'Духовка', watts: 2000, hours: 1.5, icon: 'oven', allowQuantity: false },
-  { id: 28, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 6, icon: 'air-conditioner', allowQuantity: false },
-  { id: 29, category: 'Велика побутова техніка', name: 'Посудомийна машина', watts: 1200, hours: 1.5, icon: 'dishwasher', allowQuantity: false },
-  { id: 30, category: 'Велика побутова техніка', name: 'Інше', watts: 1000, hours: 2, icon: 'other-appliance', allowQuantity: false },
+  { id: 24, category: 'Велика побутова техніка', name: 'Газовий котел', watts: 180, hours: 10, icon: 'gas-boiler', allowQuantity: false },
+  { id: 25, category: 'Велика побутова техніка', name: 'Обігрівачі', watts: 1800, hours: 3, icon: 'space-heater', allowQuantity: false },
+  { id: 26, category: 'Велика побутова техніка', name: 'Тепловентилятори', watts: 1200, hours: 2, icon: 'fan-heater', allowQuantity: false },
+  { id: 27, category: 'Велика побутова техніка', name: 'Плити', watts: 1800, hours: 1, icon: 'cooktop', allowQuantity: false },
+  { id: 28, category: 'Велика побутова техніка', name: 'Духовка', watts: 2000, hours: 1.5, icon: 'oven', allowQuantity: false },
+  { id: 29, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 6, icon: 'air-conditioner', allowQuantity: false },
+  { id: 30, category: 'Велика побутова техніка', name: 'Посудомийна машина', watts: 1200, hours: 1.5, icon: 'dishwasher', allowQuantity: false },
+  { id: 31, category: 'Велика побутова техніка', name: 'Інше', watts: 1000, hours: 2, icon: 'other-appliance', allowQuantity: false },
 
   { id: 40, category: 'Дрібна побутова техніка', name: 'Блендер', watts: 300, hours: 0.2, icon: 'blender', allowQuantity: true, maxQuantity: 3 },
   { id: 41, category: 'Дрібна побутова техніка', name: 'Мультиварка', watts: 700, hours: 1.5, icon: 'multicooker', allowQuantity: false },
@@ -696,6 +697,7 @@ if (scenarioFeedbackEl) {
 }
 
 const cardRegistry = new Map();
+let openQuantityMenuMeta = null;
 const categoryRegistry = new Map();
 const selectedRowRegistry = new Map();
 const metricAnimations = new WeakMap();
@@ -906,6 +908,125 @@ function adjustQuantity(id, delta) {
   }
 
   setQuantity(id, base + delta);
+}
+
+function toggleQuantityMenuFor(id) {
+  if (openQuantityMenuMeta && openQuantityMenuMeta.deviceId === id) {
+    closeQuantityMenu();
+    return;
+  }
+
+  openQuantityMenuFor(id);
+}
+
+function openQuantityMenuFor(id) {
+  const device = state.get(id);
+  const meta = cardRegistry.get(id);
+  if (!device || !meta || !meta.quantityMenu || !meta.quantityButton) {
+    return;
+  }
+
+  if (openQuantityMenuMeta && openQuantityMenuMeta.deviceId !== id) {
+    closeQuantityMenu({ immediate: true });
+  } else if (openQuantityMenuMeta && openQuantityMenuMeta.deviceId === id) {
+    return;
+  }
+
+  populateQuantityMenu(meta.quantityMenu, device);
+
+  meta.quantityMenu.hidden = false;
+  requestAnimationFrame(() => {
+    meta.quantityMenu.classList.add('open');
+    const selectedOption = meta.quantityMenu.querySelector('.device-quantity-option.active');
+    if (selectedOption instanceof HTMLElement) {
+      selectedOption.focus();
+    }
+  });
+
+  meta.quantityButton.classList.add('open');
+  meta.quantityButton.setAttribute('aria-expanded', 'true');
+
+  openQuantityMenuMeta = {
+    deviceId: id,
+    menu: meta.quantityMenu,
+    button: meta.quantityButton
+  };
+}
+
+function closeQuantityMenu({ immediate = false } = {}) {
+  if (!openQuantityMenuMeta) {
+    return;
+  }
+
+  const { menu, button } = openQuantityMenuMeta;
+  openQuantityMenuMeta = null;
+
+  button.classList.remove('open');
+  button.setAttribute('aria-expanded', 'false');
+
+  const finalize = () => {
+    menu.hidden = true;
+    menu.removeEventListener('transitionend', finalize);
+  };
+
+  if (immediate) {
+    menu.classList.remove('open');
+    finalize();
+    return;
+  }
+
+  menu.classList.remove('open');
+  menu.addEventListener('transitionend', finalize, { once: true });
+}
+
+function populateQuantityMenu(menu, device) {
+  menu.innerHTML = '';
+
+  const heading = document.createElement('p');
+  heading.className = 'device-quantity-menu-header';
+  heading.textContent = 'Кількість';
+  menu.appendChild(heading);
+
+  const list = document.createElement('div');
+  list.className = 'device-quantity-options';
+
+  const current = Number.isFinite(device.quantity) ? device.quantity : 0;
+
+  for (let value = 0; value <= device.maxQuantity; value += 1) {
+    const option = document.createElement('button');
+    option.type = 'button';
+    option.className = 'device-quantity-option';
+    option.dataset.value = String(value);
+    option.setAttribute('role', 'option');
+
+    const isSelected = value === current;
+    option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+
+    const label = document.createElement('span');
+    label.className = 'device-quantity-option-label';
+    label.textContent = value === 0 ? '0 — Не обрано' : String(value);
+
+    const check = document.createElement('span');
+    check.className = 'device-quantity-option-check';
+    check.textContent = '✓';
+
+    option.append(label, check);
+
+    if (isSelected) {
+      option.classList.add('active');
+    }
+
+    option.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setQuantity(device.id, value);
+      closeQuantityMenu();
+    });
+
+    list.appendChild(option);
+  }
+
+  menu.appendChild(list);
+  menu.scrollTop = 0;
 }
 
 function setTimeValue(id, value) {
@@ -1183,10 +1304,6 @@ function createCategorySection(category, index) {
     card.setAttribute('aria-expanded', 'false');
     card.tabIndex = 0;
 
-    const pill = document.createElement('span');
-    pill.className = 'device-quantity-pill';
-    pill.textContent = device.allowQuantity ? 'x0' : '—';
-
     const header = document.createElement('div');
     header.className = 'device-card-header';
 
@@ -1215,50 +1332,89 @@ function createCategorySection(category, index) {
 
     const controls = document.createElement('div');
     controls.className = 'device-card-controls';
+    let quantityDisplay = null;
+    let quantityButton = null;
+    let quantityMenu = null;
+    let toggleButton = null;
 
-    const addButton = document.createElement('button');
-    addButton.type = 'button';
-    addButton.className = 'device-add device-action';
-    addButton.textContent = '+';
-    addButton.setAttribute('aria-label', `Додати ${device.name}`);
-    addButton.addEventListener('click', (event) => {
-      event.stopPropagation();
-      const current = state.get(device.id);
-      const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
-
-      if (!device.allowQuantity) {
-        setQuantity(device.id, base > 0 ? 0 : 1);
-        return;
-      }
-
-      const nextQuantity = base > 0 ? Math.min(base + 1, device.maxQuantity) : 1;
-      setQuantity(device.id, nextQuantity);
-    });
-
-    controls.appendChild(pill);
-    controls.appendChild(addButton);
-
-    let subtractButton = null;
     if (device.allowQuantity) {
-      subtractButton = document.createElement('button');
-      subtractButton.type = 'button';
-      subtractButton.className = 'device-minus device-action';
-      subtractButton.textContent = '–';
-      subtractButton.setAttribute('aria-label', `Зменшити кількість ${device.name}`);
-      subtractButton.addEventListener('click', (event) => {
+      quantityButton = document.createElement('button');
+      quantityButton.type = 'button';
+      quantityButton.className = 'device-quantity-button';
+      quantityButton.setAttribute('aria-haspopup', 'listbox');
+      quantityButton.setAttribute('aria-expanded', 'false');
+      quantityButton.setAttribute('aria-label', `Виберіть кількість для ${device.name}`);
+
+      const value = document.createElement('span');
+      value.className = 'device-quantity-value';
+      value.textContent = '—';
+      quantityDisplay = value;
+
+      const chevron = document.createElementNS(SVG_NS, 'svg');
+      chevron.setAttribute('viewBox', '0 0 16 16');
+      chevron.setAttribute('aria-hidden', 'true');
+      const chevronPath = document.createElementNS(SVG_NS, 'path');
+      chevronPath.setAttribute('d', 'M4.5 6.5 8 10l3.5-3.5');
+      chevronPath.setAttribute('fill', 'none');
+      chevronPath.setAttribute('stroke', 'currentColor');
+      chevronPath.setAttribute('stroke-linecap', 'round');
+      chevronPath.setAttribute('stroke-linejoin', 'round');
+      chevronPath.setAttribute('stroke-width', '1.6');
+      chevron.appendChild(chevronPath);
+
+      quantityButton.appendChild(value);
+      quantityButton.appendChild(chevron);
+
+      quantityButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        adjustQuantity(device.id, -1);
+        toggleQuantityMenuFor(device.id);
       });
-      controls.appendChild(subtractButton);
+
+      controls.appendChild(quantityButton);
+
+      quantityMenu = document.createElement('div');
+      quantityMenu.className = 'device-quantity-menu';
+      quantityMenu.setAttribute('role', 'listbox');
+      quantityMenu.setAttribute('aria-label', `Кількість для ${device.name}`);
+      quantityMenu.hidden = true;
+      quantityMenu.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
+      card.appendChild(quantityMenu);
+    } else {
+      const pill = document.createElement('span');
+      pill.className = 'device-quantity-pill';
+      pill.textContent = '—';
+      quantityDisplay = pill;
+      controls.appendChild(pill);
+
+      toggleButton = document.createElement('button');
+      toggleButton.type = 'button';
+      toggleButton.className = 'device-toggle-button';
+      toggleButton.textContent = '+';
+      toggleButton.setAttribute('aria-label', `Додати ${device.name}`);
+      toggleButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const current = state.get(device.id);
+        const base = current && Number.isFinite(current.quantity) ? current.quantity : 0;
+        const next = base > 0 ? 0 : 1;
+        setQuantity(device.id, next);
+      });
+      controls.appendChild(toggleButton);
     }
 
     header.appendChild(controls);
     card.appendChild(header);
 
-    const input = null;
-
     grid.appendChild(card);
-    cardRegistry.set(device.id, { card, quantityPill: pill, input, meta, addButton, subtractButton });
+    cardRegistry.set(device.id, {
+      card,
+      meta,
+      quantityDisplay,
+      quantityButton,
+      quantityMenu,
+      toggleButton
+    });
 
     card.addEventListener('click', (event) => {
       const target = event.target;
@@ -1272,6 +1428,7 @@ function createCategorySection(category, index) {
         if (base <= 0) {
           setQuantity(device.id, 1);
         }
+        openQuantityMenuFor(device.id);
         return;
       }
 
@@ -1357,6 +1514,10 @@ function setCategoryExpanded(category, expanded, { updatePreference = true } = {
       categoryPreferences.set(category, expanded);
     }
     return;
+  }
+
+  if (!expanded && openQuantityMenuMeta && content.contains(openQuantityMenuMeta.menu)) {
+    closeQuantityMenu({ immediate: true });
   }
 
   const startHeight = content.getBoundingClientRect().height;
@@ -2468,6 +2629,18 @@ function initializeShareDialog() {
 }
 
 function handleDocumentPointerDown(event) {
+  if (openQuantityMenuMeta) {
+    const target = event.target;
+    const { menu, button } = openQuantityMenuMeta;
+    if (
+      target instanceof Node &&
+      !menu.contains(target) &&
+      !button.contains(target)
+    ) {
+      closeQuantityMenu();
+    }
+  }
+
   if (tooltipVisible && infoTooltipEl && infoTriggerBtn) {
     const target = event.target;
     if (
@@ -2482,6 +2655,11 @@ function handleDocumentPointerDown(event) {
 
 function handleDocumentKeyDown(event) {
   if (event.key !== 'Escape') {
+    return;
+  }
+
+  if (openQuantityMenuMeta) {
+    closeQuantityMenu();
     return;
   }
 
@@ -2521,37 +2699,44 @@ function updateInterface() {
       const isActive = device.quantity > 0;
       cardMeta.card.classList.toggle('active', isActive);
       cardMeta.card.setAttribute('aria-expanded', isActive ? 'true' : 'false');
-      if (device.allowQuantity) {
-        cardMeta.quantityPill.textContent = `x${device.quantity}`;
-      } else {
-        cardMeta.quantityPill.textContent = isActive ? '1' : '—';
+
+      if (cardMeta.quantityDisplay) {
+        cardMeta.quantityDisplay.textContent = device.allowQuantity
+          ? (isActive ? String(device.quantity) : '—')
+          : (isActive ? '1' : '—');
       }
-      const quantityText = String(device.quantity);
-      if (cardMeta.input && cardMeta.input.value !== quantityText) {
-        cardMeta.input.value = quantityText;
-      }
-      cardMeta.meta.textContent = getDeviceMetaText(device);
-      if (device.allowQuantity) {
-        cardMeta.addButton.textContent = '+';
-        cardMeta.addButton.setAttribute(
+
+      if (cardMeta.quantityButton) {
+        cardMeta.quantityButton.classList.toggle('selected', isActive);
+        cardMeta.quantityButton.setAttribute(
           'aria-label',
-          isActive ? `Додати ще ${device.name}` : `Додати ${device.name}`
+          isActive
+            ? `Кількість для ${device.name}: ${device.quantity}`
+            : `Виберіть кількість для ${device.name}`
         );
-        cardMeta.addButton.toggleAttribute('disabled', device.quantity >= device.maxQuantity);
-        if (cardMeta.subtractButton) {
-          cardMeta.subtractButton.toggleAttribute('disabled', device.quantity <= 0);
-        }
-      } else {
-        cardMeta.addButton.textContent = isActive ? '✓' : '+';
-        cardMeta.addButton.setAttribute(
+        cardMeta.quantityButton.setAttribute(
+          'aria-expanded',
+          openQuantityMenuMeta && openQuantityMenuMeta.deviceId === device.id ? 'true' : 'false'
+        );
+      }
+
+      if (
+        cardMeta.quantityMenu &&
+        openQuantityMenuMeta &&
+        openQuantityMenuMeta.deviceId === device.id
+      ) {
+        populateQuantityMenu(cardMeta.quantityMenu, device);
+      }
+
+      if (cardMeta.toggleButton) {
+        cardMeta.toggleButton.textContent = isActive ? '✓' : '+';
+        cardMeta.toggleButton.setAttribute(
           'aria-label',
           isActive ? `Прибрати ${device.name}` : `Додати ${device.name}`
         );
-        cardMeta.addButton.removeAttribute('disabled');
-        if (cardMeta.subtractButton) {
-          cardMeta.subtractButton.toggleAttribute('disabled', true);
-        }
       }
+
+      cardMeta.meta.textContent = getDeviceMetaText(device);
     }
   });
 
