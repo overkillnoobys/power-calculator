@@ -943,8 +943,13 @@ function openQuantityMenuFor(id) {
 
   populateQuantityMenu(meta.quantityMenu, device);
 
+  const container = meta.card.closest('.category-content');
+
   meta.quantityMenu.hidden = false;
   meta.card.classList.add('menu-open');
+  if (container instanceof HTMLElement) {
+    container.classList.add('menu-open');
+  }
   requestAnimationFrame(() => {
     meta.quantityMenu.classList.add('open');
     const selectedOption = meta.quantityMenu.querySelector('.device-quantity-option.active');
@@ -960,7 +965,8 @@ function openQuantityMenuFor(id) {
     deviceId: id,
     menu: meta.quantityMenu,
     button: meta.quantityButton,
-    card: meta.card
+    card: meta.card,
+    container: container instanceof HTMLElement ? container : null
   };
 }
 
@@ -969,13 +975,16 @@ function closeQuantityMenu({ immediate = false } = {}) {
     return;
   }
 
-  const { menu, button, card } = openQuantityMenuMeta;
+  const { menu, button, card, container } = openQuantityMenuMeta;
   openQuantityMenuMeta = null;
 
   button.classList.remove('open');
   button.setAttribute('aria-expanded', 'false');
   if (card) {
     card.classList.remove('menu-open');
+  }
+  if (container) {
+    container.classList.remove('menu-open');
   }
 
   const finalize = () => {

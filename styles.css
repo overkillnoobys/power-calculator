@@ -186,6 +186,10 @@ h1 {
   transition: height var(--transition-medium) var(--ease-soft);
 }
 
+.category-content.menu-open {
+  overflow: visible !important;
+}
+
 .category-block.expanded .category-content {
   overflow: visible;
   padding-bottom: 1.4rem;
