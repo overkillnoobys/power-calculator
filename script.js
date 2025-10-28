@@ -1584,20 +1584,7 @@ function createCategorySection(category, index) {
       value.textContent = '—';
       quantityDisplay = value;
 
-      const chevron = document.createElementNS(SVG_NS, 'svg');
-      chevron.setAttribute('viewBox', '0 0 16 16');
-      chevron.setAttribute('aria-hidden', 'true');
-      const chevronPath = document.createElementNS(SVG_NS, 'path');
-      chevronPath.setAttribute('d', 'M4.5 6.5 8 10l3.5-3.5');
-      chevronPath.setAttribute('fill', 'none');
-      chevronPath.setAttribute('stroke', 'currentColor');
-      chevronPath.setAttribute('stroke-linecap', 'round');
-      chevronPath.setAttribute('stroke-linejoin', 'round');
-      chevronPath.setAttribute('stroke-width', '1.6');
-      chevron.appendChild(chevronPath);
-
       quantityButton.appendChild(value);
-      quantityButton.appendChild(chevron);
 
       quantityButton.addEventListener('click', (event) => {
         event.stopPropagation();
