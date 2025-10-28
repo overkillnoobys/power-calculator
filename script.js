@@ -1,10 +1,13 @@
 const devices = [
-  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3, icon: 'lamp', allowQuantity: true, maxQuantity: 8 },
-  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 10, icon: 'router', allowQuantity: false },
+  { id: 1, category: 'Електроніка', name: 'Лампа', watts: 10, hours: 3, icon: 'lamp', allowQuantity: true, maxQuantity: 10 },
+  { id: 2, category: 'Електроніка', name: 'Роутер', watts: 12, hours: 12, icon: 'router', allowQuantity: false },
   { id: 3, category: 'Електроніка', name: 'Смартфон', watts: 15, hours: 2, icon: 'smartphone', allowQuantity: true, maxQuantity: 6 },
-  { id: 4, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4, icon: 'laptop', allowQuantity: true, maxQuantity: 4 },
+  { id: 4, category: 'Електроніка', name: 'Дрон', watts: 60, hours: 1.5, icon: 'drone', allowQuantity: true, maxQuantity: 3 },
+  { id: 5, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5, icon: 'satellite', allowQuantity: false },
+  { id: 6, category: 'Електроніка', name: 'Вентилятор', watts: 45, hours: 4, icon: 'fan', allowQuantity: true, maxQuantity: 4 },
+  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3, icon: 'television', allowQuantity: false },
   {
-    id: 5,
+    id: 8,
     category: 'Електроніка',
     name: 'Монітор',
     watts: 50,
@@ -16,11 +19,14 @@ const devices = [
     variants: [
       { id: 'monitor-small', label: 'До 27″ — 50 Вт', watts: 50 },
       { id: 'monitor-large', label: 'Від 27″ — 70 Вт', watts: 70 },
-      { id: 'monitor-pro', label: 'Ігровий / професійний — 100 Вт', watts: 100 }
+      { id: 'monitor-pro', label: 'Ігровий / професійний — 100 Вт', watts: 100 },
+      { id: 'custom', label: 'Свій варіант', watts: 50 }
     ]
   },
+  { id: 9, category: 'Електроніка', name: 'Проектор', watts: 120, hours: 2, icon: 'projector', allowQuantity: false },
+  { id: 10, category: 'Електроніка', name: 'Ноутбук', watts: 60, hours: 4, icon: 'laptop', allowQuantity: true, maxQuantity: 4 },
   {
-    id: 6,
+    id: 11,
     category: 'Електроніка',
     name: 'Комп’ютер',
     watts: 150,
@@ -31,25 +37,46 @@ const devices = [
     variants: [
       { id: 'pc-office', label: 'Офісний — 150 Вт', watts: 150 },
       { id: 'pc-gaming', label: 'Ігровий — 500 Вт', watts: 500 },
-      { id: 'pc-workstation', label: 'Робоча станція — 750 Вт', watts: 750 }
+      { id: 'pc-workstation', label: 'Робоча станція — 750 Вт', watts: 750 },
+      { id: 'custom', label: 'Свій варіант', watts: 150 }
     ]
   },
-  { id: 7, category: 'Електроніка', name: 'Телевізор', watts: 90, hours: 3, icon: 'television', allowQuantity: false },
-  { id: 8, category: 'Електроніка', name: 'StarLink', watts: 50, hours: 5, icon: 'satellite', allowQuantity: false },
-  { id: 9, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2, icon: 'gamepad', allowQuantity: false },
+  { id: 12, category: 'Електроніка', name: 'Ігрова приставка', watts: 140, hours: 2, icon: 'gamepad', allowQuantity: false },
+  { id: 13, category: 'Електроніка', name: 'Принтер/Сканер', watts: 45, hours: 0.5, icon: 'printer', allowQuantity: false },
+  { id: 14, category: 'Електроніка', name: 'Інше', watts: 100, hours: 2, icon: 'other-electronics', allowQuantity: false },
+
   { id: 20, category: 'Велика побутова техніка', name: 'Холодильник', watts: 120, hours: 12, icon: 'fridge', allowQuantity: false },
-  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1, icon: 'washer', allowQuantity: false },
-  { id: 22, category: 'Велика побутова техніка', name: 'Сушильна машина', watts: 800, hours: 1, icon: 'dryer', allowQuantity: false },
-  { id: 23, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 4, icon: 'air-conditioner', allowQuantity: false },
-  { id: 24, category: 'Велика побутова техніка', name: 'Електроплита', watts: 1200, hours: 1, icon: 'stove', allowQuantity: false },
-  { id: 30, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3, icon: 'coffee-maker', allowQuantity: false },
-  { id: 31, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3, icon: 'microwave', allowQuantity: false },
-  { id: 32, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2, icon: 'kettle', allowQuantity: false },
-  { id: 33, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3, icon: 'hairdryer', allowQuantity: false },
-  { id: 40, category: 'Інструменти', name: 'Шуруповерт', watts: 500, hours: 1, icon: 'screwdriver', allowQuantity: true, maxQuantity: 4 },
-  { id: 41, category: 'Інструменти', name: 'Дриль', watts: 800, hours: 0.5, icon: 'drill', allowQuantity: false },
-  { id: 42, category: 'Інструменти', name: 'Зварювальний апарат', watts: 1500, hours: 1, icon: 'welder', allowQuantity: false },
-  { id: 43, category: 'Інструменти', name: 'Компресор', watts: 1200, hours: 1, icon: 'compressor', allowQuantity: false }
+  { id: 21, category: 'Велика побутова техніка', name: 'Пральна машина', watts: 500, hours: 1.5, icon: 'washer', allowQuantity: false },
+  { id: 22, category: 'Велика побутова техніка', name: 'Конвекторні обігрівачі', watts: 1400, hours: 3, icon: 'convector-heater', allowQuantity: false },
+  { id: 23, category: 'Велика побутова техніка', name: 'Водонагрівачі', watts: 1500, hours: 2, icon: 'water-heater', allowQuantity: false },
+  { id: 24, category: 'Велика побутова техніка', name: 'Обігрівачі', watts: 1800, hours: 3, icon: 'space-heater', allowQuantity: false },
+  { id: 25, category: 'Велика побутова техніка', name: 'Тепловентилятори', watts: 1200, hours: 2, icon: 'fan-heater', allowQuantity: false },
+  { id: 26, category: 'Велика побутова техніка', name: 'Плити', watts: 1800, hours: 1, icon: 'cooktop', allowQuantity: false },
+  { id: 27, category: 'Велика побутова техніка', name: 'Духовка', watts: 2000, hours: 1.5, icon: 'oven', allowQuantity: false },
+  { id: 28, category: 'Велика побутова техніка', name: 'Кондиціонер', watts: 900, hours: 6, icon: 'air-conditioner', allowQuantity: false },
+  { id: 29, category: 'Велика побутова техніка', name: 'Посудомийна машина', watts: 1200, hours: 1.5, icon: 'dishwasher', allowQuantity: false },
+  { id: 30, category: 'Велика побутова техніка', name: 'Інше', watts: 1000, hours: 2, icon: 'other-appliance', allowQuantity: false },
+
+  { id: 40, category: 'Дрібна побутова техніка', name: 'Блендер', watts: 300, hours: 0.2, icon: 'blender', allowQuantity: true, maxQuantity: 3 },
+  { id: 41, category: 'Дрібна побутова техніка', name: 'Мультиварка', watts: 700, hours: 1.5, icon: 'multicooker', allowQuantity: false },
+  { id: 42, category: 'Дрібна побутова техніка', name: 'Кавоварка', watts: 900, hours: 0.3, icon: 'coffee-maker', allowQuantity: false },
+  { id: 43, category: 'Дрібна побутова техніка', name: 'Гриль', watts: 1200, hours: 0.5, icon: 'grill', allowQuantity: false },
+  { id: 44, category: 'Дрібна побутова техніка', name: 'Фен', watts: 1100, hours: 0.3, icon: 'hairdryer', allowQuantity: false },
+  { id: 45, category: 'Дрібна побутова техніка', name: 'Мікрохвильовка', watts: 1200, hours: 0.3, icon: 'microwave', allowQuantity: false },
+  { id: 46, category: 'Дрібна побутова техніка', name: 'Електрочайник', watts: 1500, hours: 0.2, icon: 'kettle', allowQuantity: false },
+  { id: 47, category: 'Дрібна побутова техніка', name: 'Інше', watts: 600, hours: 0.5, icon: 'other-small-appliance', allowQuantity: false },
+
+  { id: 60, category: 'Інструменти та обладнання', name: 'Акумуляторні лобзики', watts: 450, hours: 1, icon: 'jigsaw-cordless', allowQuantity: true, maxQuantity: 4 },
+  { id: 61, category: 'Інструменти та обладнання', name: 'Дриль', watts: 800, hours: 0.5, icon: 'drill', allowQuantity: false },
+  { id: 62, category: 'Інструменти та обладнання', name: 'Акумуляторні шуруповерти', watts: 500, hours: 1, icon: 'screwdriver', allowQuantity: true, maxQuantity: 4 },
+  { id: 63, category: 'Інструменти та обладнання', name: 'Лобзики', watts: 600, hours: 1, icon: 'jigsaw', allowQuantity: false },
+  { id: 64, category: 'Інструменти та обладнання', name: 'Акумуляторні тримери або косарки', watts: 1000, hours: 1.5, icon: 'trimmer', allowQuantity: false },
+  { id: 65, category: 'Інструменти та обладнання', name: 'Перфоратори', watts: 900, hours: 0.8, icon: 'perforator', allowQuantity: false },
+  { id: 66, category: 'Інструменти та обладнання', name: 'Електричні перфоратори', watts: 1100, hours: 0.8, icon: 'perforator-heavy', allowQuantity: false },
+  { id: 67, category: 'Інструменти та обладнання', name: 'Будівельні пилососи', watts: 1400, hours: 1.5, icon: 'shop-vac', allowQuantity: false },
+  { id: 68, category: 'Інструменти та обладнання', name: 'Фрезерні машини', watts: 1200, hours: 1, icon: 'router-tool', allowQuantity: false },
+  { id: 69, category: 'Інструменти та обладнання', name: 'Електричні компресори', watts: 1500, hours: 1, icon: 'compressor', allowQuantity: false },
+  { id: 70, category: 'Інструменти та обладнання', name: 'Інше', watts: 900, hours: 1, icon: 'other-tools', allowQuantity: false }
 ];
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -82,6 +109,20 @@ const iconDefinitions = {
       { tag: 'rect', attrs: { x: '8', y: '3', width: '8', height: '18', rx: '2' } },
       { tag: 'line', attrs: { x1: '10', y1: '6', x2: '14', y2: '6' } },
       { tag: 'circle', attrs: { cx: '12', cy: '18', r: '0.9', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  drone: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'circle', attrs: { cx: '12', cy: '12', r: '2.2', fill: 'none' } },
+      { tag: 'rect', attrs: { x: '3.5', y: '3.5', width: '5', height: '5', rx: '1.6' } },
+      { tag: 'rect', attrs: { x: '15.5', y: '3.5', width: '5', height: '5', rx: '1.6' } },
+      { tag: 'rect', attrs: { x: '3.5', y: '15.5', width: '5', height: '5', rx: '1.6' } },
+      { tag: 'rect', attrs: { x: '15.5', y: '15.5', width: '5', height: '5', rx: '1.6' } },
+      { tag: 'path', attrs: { d: 'M8.5 8.5 11 11', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M15.5 8.5 13 11', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M8.5 15.5 11 13', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M15.5 15.5 13 13', fill: 'none' } }
     ]
   },
   laptop: {
@@ -118,6 +159,18 @@ const iconDefinitions = {
       { tag: 'line', attrs: { x1: '9', y1: '20', x2: '15', y2: '20' } }
     ]
   },
+  fan: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'circle', attrs: { cx: '12', cy: '12', r: '5.5', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M12 6.5v4.4', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M8.3 9.3 11.6 11', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M15.7 9.3 12.4 11', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M10.4 15.2 12 12.4', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M13.6 15.2 12 12.4', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '12', r: '1.1', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
   satellite: {
     viewBox: '0 0 24 24',
     elements: [
@@ -126,6 +179,16 @@ const iconDefinitions = {
       { tag: 'line', attrs: { x1: '17', y1: '3', x2: '21', y2: '7' } },
       { tag: 'line', attrs: { x1: '15.5', y1: '4.5', x2: '19.5', y2: '8.5' } },
       { tag: 'circle', attrs: { cx: '12', cy: '10', r: '1.1', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  projector: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '3.5', y: '8', width: '17', height: '8', rx: '2' } },
+      { tag: 'circle', attrs: { cx: '15.5', cy: '12', r: '2.4', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '8.5', cy: '12', r: '0.8', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'line', attrs: { x1: '6', y1: '16', x2: '7.4', y2: '18' } },
+      { tag: 'line', attrs: { x1: '18', y1: '16', x2: '16.6', y2: '18' } }
     ]
   },
   gamepad: {
@@ -142,6 +205,23 @@ const iconDefinitions = {
       { tag: 'line', attrs: { x1: '10', y1: '10.8', x2: '10', y2: '13.2' } },
       { tag: 'circle', attrs: { cx: '14.8', cy: '12.3', r: '0.8', fill: 'currentColor', stroke: 'none' } },
       { tag: 'circle', attrs: { cx: '16.9', cy: '14', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  printer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '8', width: '14', height: '8', rx: '1.6' } },
+      { tag: 'rect', attrs: { x: '7', y: '4.5', width: '10', height: '4', rx: '1' } },
+      { tag: 'line', attrs: { x1: '8.5', y1: '12', x2: '12.5', y2: '12' } },
+      { tag: 'circle', attrs: { cx: '16', cy: '12', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  'other-electronics': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M8 6h8l3 5-3 5H8l-3-5Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '8.5', x2: '12', y2: '13.5' } },
+      { tag: 'line', attrs: { x1: '10', y1: '11', x2: '14', y2: '11' } }
     ]
   },
   fridge: {
@@ -163,14 +243,62 @@ const iconDefinitions = {
       { tag: 'circle', attrs: { cx: '11', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
     ]
   },
-  dryer: {
+  'convector-heater': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '4', y: '7', width: '16', height: '10', rx: '2' } },
+      { tag: 'line', attrs: { x1: '7', y1: '9', x2: '17', y2: '9' } },
+      { tag: 'line', attrs: { x1: '7', y1: '13', x2: '17', y2: '13' } },
+      { tag: 'line', attrs: { x1: '9', y1: '17', x2: '9', y2: '19' } },
+      { tag: 'line', attrs: { x1: '15', y1: '17', x2: '15', y2: '19' } }
+    ]
+  },
+  'water-heater': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '8', y: '4', width: '8', height: '16', rx: '4' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '10', r: '1.3', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '4', x2: '12', y2: '2.5' } },
+      { tag: 'line', attrs: { x1: '10', y1: '20', x2: '10', y2: '21.5' } },
+      { tag: 'line', attrs: { x1: '14', y1: '20', x2: '14', y2: '21.5' } }
+    ]
+  },
+  'space-heater': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '6', y: '6', width: '12', height: '12', rx: '2' } },
+      { tag: 'path', attrs: { d: 'M9 9.5c.8-1 2.2-1 3 0s2.2 1 3 0', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M9 13.5c.8-1 2.2-1 3 0s2.2 1 3 0', fill: 'none' } }
+    ]
+  },
+  'fan-heater': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '7', width: '14', height: '10', rx: '2' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '12', r: '3', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '9', x2: '12', y2: '12' } },
+      { tag: 'line', attrs: { x1: '9.5', y1: '13.5', x2: '12', y2: '12' } },
+      { tag: 'line', attrs: { x1: '14.5', y1: '13.5', x2: '12', y2: '12' } }
+    ]
+  },
+  cooktop: {
     viewBox: '0 0 24 24',
     elements: [
       { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
-      { tag: 'circle', attrs: { cx: '12', cy: '13', r: '4', fill: 'none' } },
-      { tag: 'path', attrs: { d: 'M9.5 13a2.5 2.5 0 0 0 3.5 0 2.5 2.5 0 0 1 3.5 0', fill: 'none' } },
-      { tag: 'path', attrs: { d: 'M8.5 10.8a3.8 3.8 0 0 1 6.7 0', fill: 'none' } },
-      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+      { tag: 'circle', attrs: { cx: '9', cy: '9', r: '2', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '9', r: '2', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '15', r: '1.8', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '15', cy: '15', r: '1.8', fill: 'none' } }
+    ]
+  },
+  oven: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
+      { tag: 'rect', attrs: { x: '7', y: '9', width: '10', height: '7', rx: '1.2', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '11', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '13', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
     ]
   },
   'air-conditioner': {
@@ -183,14 +311,41 @@ const iconDefinitions = {
       { tag: 'path', attrs: { d: 'M13 14.5c0 1.8-1.2 3.2-3 3.7', fill: 'none' } }
     ]
   },
-  stove: {
+  dishwasher: {
     viewBox: '0 0 24 24',
     elements: [
       { tag: 'rect', attrs: { x: '5', y: '4', width: '14', height: '16', rx: '1.8' } },
-      { tag: 'circle', attrs: { cx: '9', cy: '8.5', r: '1.6', fill: 'none' } },
-      { tag: 'circle', attrs: { cx: '15', cy: '8.5', r: '1.6', fill: 'none' } },
-      { tag: 'circle', attrs: { cx: '9', cy: '13.5', r: '1.4', fill: 'none' } },
-      { tag: 'circle', attrs: { cx: '15', cy: '13.5', r: '1.4', fill: 'none' } }
+      { tag: 'line', attrs: { x1: '8', y1: '8', x2: '16', y2: '8' } },
+      { tag: 'path', attrs: { d: 'M8 12h8l-1 3H9Z', fill: 'none' } },
+      { tag: 'circle', attrs: { cx: '9', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } },
+      { tag: 'circle', attrs: { cx: '11', cy: '7', r: '0.6', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  'other-appliance': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '6', y: '5', width: '12', height: '14', rx: '2' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '12', r: '3.2', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '8', x2: '12', y2: '16' } }
+    ]
+  },
+  blender: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M8 5h8l-1 8H9Z', fill: 'none' } },
+      { tag: 'rect', attrs: { x: '9', y: '13', width: '6', height: '3.5', rx: '0.8' } },
+      { tag: 'line', attrs: { x1: '10', y1: '16.5', x2: '9', y2: '19' } },
+      { tag: 'line', attrs: { x1: '14', y1: '16.5', x2: '15', y2: '19' } },
+      { tag: 'line', attrs: { x1: '11', y1: '9', x2: '13', y2: '9' } }
+    ]
+  },
+  multicooker: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '6', y: '7', width: '12', height: '9', rx: '3' } },
+      { tag: 'rect', attrs: { x: '8', y: '5', width: '8', height: '3', rx: '1.2' } },
+      { tag: 'line', attrs: { x1: '10', y1: '13', x2: '14', y2: '13' } },
+      { tag: 'circle', attrs: { cx: '12', cy: '10.5', r: '1.2', fill: 'none' } }
     ]
   },
   'coffee-maker': {
@@ -199,6 +354,26 @@ const iconDefinitions = {
       { tag: 'path', attrs: { d: 'M7 4h10v5a4 4 0 0 1-4 4h-2v3.5a2.5 2.5 0 0 0 5 0V15', fill: 'none' } },
       { tag: 'path', attrs: { d: 'M7 4v12a3 3 0 0 0 3 3h1.2', fill: 'none' } },
       { tag: 'circle', attrs: { cx: '14.5', cy: '7', r: '0.8', fill: 'currentColor', stroke: 'none' } }
+    ]
+  },
+  grill: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '5', y: '8', width: '14', height: '5', rx: '1.4' } },
+      { tag: 'path', attrs: { d: 'M7 13l1.5 4.5', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M17 13l-1.5 4.5', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '8.5', y1: '10', x2: '15.5', y2: '10' } },
+      { tag: 'line', attrs: { x1: '12', y1: '13', x2: '12', y2: '18' } }
+    ]
+  },
+  hairdryer: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5 10h9a4 4 0 0 0 4-4V5a2 2 0 0 0-2-2H9a4 4 0 0 0-4 4v3Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '5', y1: '10', x2: '5', y2: '13.5' } },
+      { tag: 'line', attrs: { x1: '5', y1: '13.5', x2: '7.5', y2: '17' } },
+      { tag: 'line', attrs: { x1: '17', y1: '6', x2: '20', y2: '6' } },
+      { tag: 'line', attrs: { x1: '17', y1: '8', x2: '19.5', y2: '8' } }
     ]
   },
   microwave: {
@@ -218,14 +393,31 @@ const iconDefinitions = {
       { tag: 'line', attrs: { x1: '9', y1: '5', x2: '15', y2: '5' } }
     ]
   },
-  hairdryer: {
+  'other-small-appliance': {
     viewBox: '0 0 24 24',
     elements: [
-      { tag: 'path', attrs: { d: 'M5 10h9a4 4 0 0 0 4-4V5a2 2 0 0 0-2-2H9a4 4 0 0 0-4 4v3Z', fill: 'none' } },
-      { tag: 'line', attrs: { x1: '5', y1: '10', x2: '5', y2: '13.5' } },
-      { tag: 'line', attrs: { x1: '5', y1: '13.5', x2: '7.5', y2: '17' } },
-      { tag: 'line', attrs: { x1: '17', y1: '6', x2: '20', y2: '6' } },
-      { tag: 'line', attrs: { x1: '17', y1: '8', x2: '19.5', y2: '8' } }
+      { tag: 'rect', attrs: { x: '7', y: '6', width: '10', height: '12', rx: '2' } },
+      { tag: 'path', attrs: { d: 'M10 10h4l-1 4h-2Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '10', y1: '7.5', x2: '14', y2: '7.5' } }
+    ]
+  },
+  'jigsaw-cordless': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5 10h9a4 4 0 0 1 4 4v3H5Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '5', y1: '13', x2: '18', y2: '13' } },
+      { tag: 'path', attrs: { d: 'M18 17v2H6l-1-2', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '9', y1: '17', x2: '9', y2: '20' } },
+      { tag: 'line', attrs: { x1: '12', y1: '17', x2: '12', y2: '20' } }
+    ]
+  },
+  jigsaw: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5 11h10a3 3 0 0 1 3 3v2H5Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '6', y1: '13', x2: '17', y2: '13' } },
+      { tag: 'path', attrs: { d: 'M17 16v2H7l-1-2', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '10', y1: '16', x2: '10', y2: '19' } }
     ]
   },
   screwdriver: {
@@ -246,14 +438,49 @@ const iconDefinitions = {
       { tag: 'line', attrs: { x1: '18', y1: '11', x2: '20', y2: '11' } }
     ]
   },
-  welder: {
+  trimmer: {
     viewBox: '0 0 24 24',
     elements: [
-      { tag: 'rect', attrs: { x: '6', y: '5', width: '12', height: '15', rx: '2' } },
-      { tag: 'rect', attrs: { x: '9', y: '9', width: '6', height: '5', rx: '1', fill: 'none' } },
-      { tag: 'line', attrs: { x1: '12', y1: '5', x2: '12', y2: '3' } },
-      { tag: 'path', attrs: { d: 'M15.5 17.5 18 21', fill: 'none' } },
-      { tag: 'path', attrs: { d: 'M9 17.5 6 21', fill: 'none' } }
+      { tag: 'path', attrs: { d: 'M6 6h5l3 6-2 2-3-6H6Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M12 14 9 20', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '14', y1: '4', x2: '18', y2: '4' } },
+      { tag: 'line', attrs: { x1: '17', y1: '4', x2: '20', y2: '9' } }
+    ]
+  },
+  perforator: {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M4 10h11a3 3 0 0 1 3 3v1.5H4Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M18 12h2v2h-2Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M12 14v4l-1.5 1-1.5-1v-4', fill: 'none' } }
+    ]
+  },
+  'perforator-heavy': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M5 10h11a3 3 0 0 1 3 3v2H5Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M19 13h2.5v2.5H19Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '11', y1: '15', x2: '11', y2: '20' } },
+      { tag: 'line', attrs: { x1: '9', y1: '15', x2: '9', y2: '20' } }
+    ]
+  },
+  'shop-vac': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '6', y: '7', width: '12', height: '10', rx: '2' } },
+      { tag: 'rect', attrs: { x: '8', y: '4.5', width: '8', height: '3', rx: '1.2' } },
+      { tag: 'line', attrs: { x1: '9', y1: '17', x2: '8', y2: '20' } },
+      { tag: 'line', attrs: { x1: '15', y1: '17', x2: '16', y2: '20' } },
+      { tag: 'path', attrs: { d: 'M6 12h12', fill: 'none' } }
+    ]
+  },
+  'router-tool': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'rect', attrs: { x: '7', y: '5', width: '10', height: '9', rx: '2' } },
+      { tag: 'path', attrs: { d: 'M7 14h10v3H7Z', fill: 'none' } },
+      { tag: 'path', attrs: { d: 'M10 17v2l2 1 2-1v-2', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '9', y1: '7.5', x2: '15', y2: '7.5' } }
     ]
   },
   compressor: {
@@ -266,6 +493,14 @@ const iconDefinitions = {
       { tag: 'rect', attrs: { x: '10', y: '5', width: '4', height: '2', rx: '0.8' } }
     ]
   },
+  'other-tools': {
+    viewBox: '0 0 24 24',
+    elements: [
+      { tag: 'path', attrs: { d: 'M7 7h5l3 5-3 5H7l-3-5Z', fill: 'none' } },
+      { tag: 'line', attrs: { x1: '12', y1: '9', x2: '12', y2: '13' } },
+      { tag: 'line', attrs: { x1: '10', y1: '11', x2: '14', y2: '11' } }
+    ]
+  },
   generic: {
     viewBox: '0 0 24 24',
     elements: [
@@ -275,6 +510,7 @@ const iconDefinitions = {
     ]
   }
 };
+
 
 function createIconElement(key) {
   const definition = iconDefinitions[key] || iconDefinitions.generic;
