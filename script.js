@@ -894,6 +894,11 @@ function setQuantity(id, quantity) {
   }
 
   device.quantity = nextQuantity;
+
+  if (nextQuantity === 0 && openQuantityMenuMeta && openQuantityMenuMeta.deviceId === id) {
+    closeQuantityMenu({ immediate: true });
+  }
+
   updateInterface();
 }
 
@@ -923,6 +928,10 @@ function openQuantityMenuFor(id) {
   const device = state.get(id);
   const meta = cardRegistry.get(id);
   if (!device || !meta || !meta.quantityMenu || !meta.quantityButton) {
+    return;
+  }
+
+  if (device.quantity <= 0) {
     return;
   }
 
@@ -1415,6 +1424,24 @@ function createCategorySection(category, index) {
       quantityMenu,
       toggleButton
     });
+
+    const currentState = state.get(device.id);
+    const baseQuantity = currentState && Number.isFinite(currentState.quantity) ? currentState.quantity : 0;
+    if (quantityButton) {
+      const isActive = baseQuantity > 0;
+      quantityButton.hidden = !isActive;
+      quantityButton.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+      quantityButton.tabIndex = isActive ? 0 : -1;
+      quantityButton.classList.toggle('selected', isActive);
+      if (quantityDisplay) {
+        quantityDisplay.textContent = isActive ? String(baseQuantity) : '—';
+      }
+    }
+
+    if (baseQuantity > 0) {
+      card.classList.add('active');
+      card.setAttribute('aria-expanded', 'true');
+    }
 
     card.addEventListener('click', (event) => {
       const target = event.target;
@@ -2708,6 +2735,12 @@ function updateInterface() {
 
       if (cardMeta.quantityButton) {
         cardMeta.quantityButton.classList.toggle('selected', isActive);
+        cardMeta.quantityButton.hidden = !isActive;
+        cardMeta.quantityButton.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        cardMeta.quantityButton.tabIndex = isActive ? 0 : -1;
+        if (!isActive) {
+          cardMeta.quantityButton.classList.remove('open');
+        }
         cardMeta.quantityButton.setAttribute(
           'aria-label',
           isActive
@@ -2726,6 +2759,9 @@ function updateInterface() {
         openQuantityMenuMeta.deviceId === device.id
       ) {
         populateQuantityMenu(cardMeta.quantityMenu, device);
+      } else if (cardMeta.quantityMenu && !isActive) {
+        cardMeta.quantityMenu.classList.remove('open');
+        cardMeta.quantityMenu.hidden = true;
       }
 
       if (cardMeta.toggleButton) {
