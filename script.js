@@ -299,88 +299,6 @@ function createIconElement(key) {
   return svg;
 }
 
-function escapeSvgText(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function hashString(value) {
-  const input = String(value ?? '');
-  let hash = 0;
-  for (let index = 0; index < input.length; index += 1) {
-    hash = (hash << 5) - hash + input.charCodeAt(index);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-const stationPalettes = [
-  { test: /bluetti/i, colors: { primary: '#4338ca', secondary: '#7c3aed', accent: '#a855f7', detail: '#c4b5fd', border: '#5b21b6' } },
-  { test: /powerplant/i, colors: { primary: '#0f766e', secondary: '#16a34a', accent: '#22d3ee', detail: '#bbf7d0', border: '#0d9488' } }
-];
-
-const defaultStationPalette = {
-  primary: '#1d4ed8',
-  secondary: '#7c3aed',
-  accent: '#38bdf8',
-  detail: '#cbd5f5',
-  border: '#1e40af'
-};
-
-function getStationPalette(name) {
-  if (!name) {
-    return defaultStationPalette;
-  }
-
-  const paletteEntry = stationPalettes.find((entry) => entry.test.test(name));
-  return paletteEntry ? paletteEntry.colors : defaultStationPalette;
-}
-
-function createStationIllustration(station) {
-  const palette = getStationPalette(station.name);
-  const safeName = escapeSvgText(station.name || station.model || 'Зарядна станція');
-  const safeModel = escapeSvgText(station.model || station.name || 'Модель');
-  const capacityLabel = `${Math.round(station.capacityWh)} Wh`;
-  const powerLabel = `${Math.round(station.powerW)} W`;
-  const safeMetrics = escapeSvgText(`${capacityLabel} • ${powerLabel}`);
-  const gradientId = `station-grad-${hashString(`${station.name}-${station.model}`)}`;
-  const bodyId = `station-body-${hashString(`${station.model}-${station.powerW}`)}`;
-
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160" role="img" aria-label="${safeName}">
-      <defs>
-        <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="${palette.primary}" />
-          <stop offset="100%" stop-color="${palette.secondary}" />
-        </linearGradient>
-        <linearGradient id="${bodyId}" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="${palette.detail}" stop-opacity="0.92" />
-          <stop offset="100%" stop-color="${palette.accent}" stop-opacity="0.98" />
-        </linearGradient>
-      </defs>
-      <rect width="220" height="160" rx="28" fill="url(#${gradientId})" />
-      <rect x="36" y="44" width="148" height="72" rx="20" fill="url(#${bodyId})" stroke="${palette.border}" stroke-width="4" />
-      <rect x="164" y="64" width="16" height="32" rx="8" fill="${palette.detail}" fill-opacity="0.92" />
-      <g opacity="0.35" fill="none" stroke="#0b0a1d" stroke-width="3" stroke-linecap="round">
-        <path d="M70 76h34" />
-        <path d="M70 90h26" />
-        <path d="M70 62h42" />
-      </g>
-      <circle cx="128" cy="88" r="12" fill="#0f172a" fill-opacity="0.22" />
-      <path d="M126 80 134 88 126 96" fill="none" stroke="#0f172a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.45" />
-      <text x="40" y="122" fill="#f8fafc" font-size="18" font-weight="700" font-family="Manrope, 'Segoe UI', Roboto, sans-serif">${safeModel}</text>
-      <text x="40" y="140" fill="#e2e8f0" font-size="12" font-weight="500" font-family="Manrope, 'Segoe UI', Roboto, sans-serif">${safeMetrics}</text>
-    </svg>
-  `;
-
-  const compact = svg.replace(/\s{2,}/g, ' ').trim();
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(compact)}`;
-}
-
 const stations = [
   {
     name: 'Bluetti Apex 300',
@@ -461,12 +379,6 @@ const stations = [
   }
 ];
 
-stations.forEach((station) => {
-  if (!station.image) {
-    station.image = createStationIllustration(station);
-  }
-});
-
 const state = new Map(
   devices.map((device) => {
     const hasVariants = Array.isArray(device.variants) && device.variants.length > 0;
@@ -511,12 +423,9 @@ const selectedTableBody = document.getElementById('selected-devices');
 const totalEnergyEl = document.getElementById('total-energy');
 const totalBufferedEl = document.getElementById('total-buffered');
 const totalPowerEl = document.getElementById('total-power');
-const recommendationCard = document.getElementById('recommendation-card');
 const matchLabel = document.getElementById('match-label');
 const stationNameEl = document.getElementById('station-name');
 const stationSpecsEl = document.getElementById('station-specs');
-const stationMediaEl = document.getElementById('station-media');
-const stationImageEl = document.getElementById('station-image');
 const stationLinkEl = document.getElementById('station-link');
 const stationConsultEl = document.getElementById('station-consult');
 const alternativesSection = document.getElementById('alternatives-section');
@@ -535,16 +444,6 @@ const infoTooltipEl = document.getElementById('buffer-tooltip');
 
 const BUFFER_FACTOR = 0.94;
 const BUFFER_PERCENT = Math.round(BUFFER_FACTOR * 100);
-
-if (stationMediaEl) {
-  stationMediaEl.classList.add('is-empty');
-  stationMediaEl.setAttribute('aria-hidden', 'true');
-}
-
-if (stationImageEl) {
-  stationImageEl.loading = 'lazy';
-  stationImageEl.decoding = 'async';
-}
 
 if (scenarioFeedbackEl) {
   scenarioFeedbackEl.dataset.state = 'hidden';
@@ -1609,25 +1508,15 @@ function renderRecommendation(recommendation, totalPower, totalEnergy) {
     matchLabel.classList.remove('warning');
     stationNameEl.textContent = 'Оберіть пристрої для рекомендації';
     stationSpecsEl.innerHTML = '';
-    if (stationImageEl) {
-      stationImageEl.removeAttribute('src');
-      stationImageEl.alt = '';
-    }
-    if (stationMediaEl) {
-      stationMediaEl.classList.add('is-empty');
-      stationMediaEl.setAttribute('aria-hidden', 'true');
-    }
     stationLinkEl.classList.add('disabled');
     stationLinkEl.href = '#';
     stationConsultEl.classList.add('disabled');
     stationConsultEl.href = CONSULTATION_URL;
-    recommendationCard.classList.remove('has-media');
     alternativesSection.style.display = 'none';
     return;
   }
 
   const { station, alternatives } = recommendation;
-  const hasImage = Boolean(station.image);
 
   const energyMatch = station.capacityWh >= totalEnergy;
   const powerMatch = station.powerW >= totalPower;
@@ -1642,26 +1531,6 @@ function renderRecommendation(recommendation, totalPower, totalEnergy) {
 
   stationNameEl.textContent = station.name;
   stationSpecsEl.innerHTML = '';
-
-  if (stationImageEl && hasImage) {
-    stationImageEl.src = station.image;
-    stationImageEl.alt = `Зарядна станція ${station.name}`;
-  } else if (stationImageEl) {
-    stationImageEl.removeAttribute('src');
-    stationImageEl.alt = '';
-  }
-
-  if (stationMediaEl) {
-    if (hasImage) {
-      stationMediaEl.classList.remove('is-empty');
-      stationMediaEl.setAttribute('aria-hidden', 'false');
-    } else {
-      stationMediaEl.classList.add('is-empty');
-      stationMediaEl.setAttribute('aria-hidden', 'true');
-    }
-  }
-
-  recommendationCard.classList.toggle('has-media', hasImage);
 
   const specs = [
     { label: 'Модель', value: station.model },
@@ -1719,26 +1588,7 @@ function renderAlternatives(alternatives, selectedStation) {
     actions.append(link);
     info.appendChild(actions);
 
-    const media = document.createElement('figure');
-    media.className = 'alternative-media';
-
-    const hasImage = Boolean(station.image);
-    card.classList.toggle('has-media', hasImage);
-
-    if (hasImage) {
-      const img = document.createElement('img');
-      img.src = station.image;
-      img.alt = `Зарядна станція ${station.name}`;
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      media.appendChild(img);
-      media.setAttribute('aria-hidden', 'false');
-    } else {
-      media.classList.add('is-empty');
-      media.setAttribute('aria-hidden', 'true');
-    }
-
-    card.append(info, media);
+    card.appendChild(info);
     alternativeListEl.appendChild(card);
   });
 

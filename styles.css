@@ -902,7 +902,6 @@ tbody td {
 .recommendation {
   position: relative;
   overflow: hidden;
-  --recommendation-media-size: 8.75rem;
 }
 
 .recommendation::after {
@@ -927,16 +926,10 @@ tbody td {
 }
 
 .recommendation-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 1.2rem;
   margin-top: 1.2rem;
-}
-
-.recommendation.has-media .recommendation-body {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: 1.6rem;
 }
 
 .recommendation-info {
@@ -949,42 +942,6 @@ tbody td {
   margin-top: auto;
 }
 
-.recommendation-media {
-  position: relative;
-  margin: 0;
-  width: var(--recommendation-media-size);
-  height: var(--recommendation-media-size);
-  border-radius: 20px;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12), rgba(31, 23, 57, 0.9));
-  box-shadow: 0 16px 44px rgba(12, 10, 35, 0.35);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  transition:
-    transform var(--transition-medium) var(--ease-soft),
-    box-shadow var(--transition-medium) var(--ease-soft);
-  justify-self: end;
-  align-self: center;
-  z-index: 1;
-}
-
-.recommendation-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.recommendation:hover .recommendation-media {
-  transform: translateY(-4px);
-  box-shadow: 0 26px 56px rgba(64, 37, 108, 0.45);
-}
-
-.recommendation-media.is-empty {
-  display: none;
-}
 
 .match-label {
   padding: 0.2rem 0.7rem;
@@ -1112,12 +1069,6 @@ tbody td {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  --alternative-media-size: 5.5rem;
-}
-
-.alternative-card.has-media {
-  padding-right: calc(var(--alternative-media-size) + 2.2rem);
-  min-height: calc(var(--alternative-media-size) + 1.6rem);
 }
 
 .alternative-card::before {
@@ -1158,34 +1109,6 @@ tbody td {
   gap: 0.6rem;
 }
 
-.alternative-media {
-  margin: 0;
-  border-radius: 18px;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12), rgba(31, 23, 57, 0.9));
-  box-shadow: 0 14px 38px rgba(10, 6, 30, 0.32);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: var(--alternative-media-size);
-  height: var(--alternative-media-size);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.alternative-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.alternative-media.is-empty {
-  display: none;
-}
 
 .breakdown {
   margin-bottom: 3.5rem;
@@ -1518,10 +1441,6 @@ tbody td {
     flex: 1 1 auto;
   }
 
-  .recommendation {
-    --recommendation-media-size: 8.25rem;
-  }
-
 }
 
 @media (max-width: 900px) {
@@ -1570,21 +1489,7 @@ tbody td {
     justify-content: center;
   }
 
-  .recommendation {
-    --recommendation-media-size: 7rem;
-  }
-
-  .recommendation.has-media .recommendation-body {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .recommendation.has-media .recommendation-media {
-    justify-self: center;
-  }
-
-  .alternative-card {
-    --alternative-media-size: 4.75rem;
-  }
+  
 }
 
 @media (max-width: 640px) {
@@ -1599,14 +1504,6 @@ tbody td {
   .scenario-actions {
     padding: 0.32rem 0.5rem;
     gap: 0.5rem;
-  }
-
-  .recommendation {
-    --recommendation-media-size: 6.25rem;
-  }
-
-  .alternative-card {
-    --alternative-media-size: 4.2rem;
   }
 
   .scenario-button {
@@ -1774,14 +1671,6 @@ tbody td {
     padding: 0.75rem 0.8rem 0.85rem;
   }
 
-  .recommendation {
-    --recommendation-media-size: 5.8rem;
-  }
-
-  .alternative-card {
-    --alternative-media-size: 3.9rem;
-  }
-
   .selected-devices tbody tr td {
     font-size: 0.84rem;
     gap: 0.18rem;
@@ -1880,14 +1769,6 @@ tbody td {
     gap: 0.5rem 0.7rem;
     padding: 0.7rem 0.75rem 0.8rem;
     border-radius: 14px;
-  }
-
-  .recommendation {
-    --recommendation-media-size: 5.1rem;
-  }
-
-  .alternative-card {
-    --alternative-media-size: 3.6rem;
   }
 
   .selected-devices tbody tr td {
