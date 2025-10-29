@@ -21,6 +21,19 @@
 
   const assetBase = normalizeBase(config.assetBase);
 
+  function ensureSecureAssetBase(base) {
+    if (!base) {
+      return;
+    }
+    if (/^http:\/\//i.test(base)) {
+      throw new Error(
+        'POWER_CALCULATOR_ASSET_BASE має використовувати HTTPS або відносний шлях. Небезпечний HTTP заблоковано.'
+      );
+    }
+  }
+
+  ensureSecureAssetBase(assetBase);
+
   function ensureMount(selector) {
     if (selector) {
       const existing = document.querySelector(selector);

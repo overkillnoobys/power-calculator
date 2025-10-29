@@ -2257,7 +2257,7 @@ function renderAlternatives(alternatives, selectedStation) {
     const link = document.createElement('a');
     link.href = station.link;
     link.target = '_blank';
-    link.rel = 'noopener';
+    link.rel = 'noopener noreferrer';
     link.textContent = 'Купити станцію';
 
     actions.append(link);
