@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+    />
+    <title>Калькулятор зарядних станцій</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="background-glow" aria-hidden="true"></div>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Енергоефективність</p>
+          <h1>Калькулятор потужності зарядної станції</h1>
+          <p class="lead">
+            Оберіть техніку та кількість пристроїв, які плануєте підключати. Ми розрахуємо загальне споживання та
+            запропонуємо найкращу зарядну станцію для ваших потреб.
+          </p>
+        </div>
+      </header>
+
+      <section class="device-categories" id="device-categories" aria-label="Категорії пристроїв"></section>
+
+      <section class="scenario-toolbar" id="tuning" aria-label="Дії зі сценарієм">
+        <div class="scenario-actions" role="group" aria-label="Зберігання та поширення конфігурації">
+          <button type="button" id="save-scenario" class="scenario-button" aria-label="Зберегти конфігурацію">
+            <span class="scenario-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M6.5 4.25h9.4l2.85 2.85v12.65H6.5z" />
+                <path d="M9 4.25v6.75h6V4.25" />
+                <path d="M8.25 19.75v-4.5h7.5v4.5" />
+              </svg>
+            </span>
+            <span class="sr-only">Зберегти конфігурацію</span>
+          </button>
+          <button type="button" id="reset-scenario" class="scenario-button subtle" aria-label="Очистити конфігурацію">
+            <span class="scenario-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M7.25 7.75a6.75 6.75 0 0 1 10.34-.86" />
+                <path d="M8.25 4.75L7 7.75h3" />
+                <path d="M16.75 16.25a6.75 6.75 0 0 1-10.34.86" />
+                <path d="M15.75 19.25L17 16.25h-3" />
+              </svg>
+            </span>
+            <span class="sr-only">Очистити конфігурацію</span>
+          </button>
+          <button type="button" id="share-scenario" class="scenario-button highlight" aria-label="Поділитися конфігурацією">
+            <span class="scenario-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 4.25v10.5" />
+                <path d="M8.5 7.75L12 4.25l3.5 3.5" />
+                <path d="M6.25 13.75v6h11.5v-6" />
+              </svg>
+            </span>
+            <span class="sr-only">Поділитися конфігурацією</span>
+          </button>
+        </div>
+        <p class="scenario-feedback" id="scenario-feedback" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="selected-devices hidden" id="selected-section">
+        <div class="section-heading">
+          <h2>Вибрані пристрої</h2>
+          <p>Налаштуйте кількість та орієнтовний час роботи для точного розрахунку споживання.</p>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Пристрій</th>
+                <th>Кількість</th>
+                <th>Потужність, Вт</th>
+                <th>Час роботи</th>
+                <th>Споживання, Wh</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="selected-devices"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="summary" aria-label="Підсумок">
+        <article class="summary-card">
+          <h3>Орієнтовне споживання</h3>
+          <p class="summary-value" id="total-energy">0 Wh</p>
+          <p class="summary-helper">Розраховано з урахуванням кількості та часу роботи пристроїв.</p>
+        </article>
+        <article class="summary-card summary-buffer">
+          <div class="summary-title-with-info">
+            <h3>Споживання з урахуванням ККД та резерву</h3>
+            <button type="button" class="info-trigger" aria-describedby="buffer-tooltip" aria-label="Пояснення ККД та резерву">
+              i
+            </button>
+            <div class="info-tooltip" id="buffer-tooltip" role="tooltip" aria-hidden="true">
+              <p>
+                ККД враховує втрати інвертора, а резерв батареї запобігає глибокому розряджанню. Ми застосовуємо спільний
+                коефіцієнт 94%, щоб підказати необхідну ємність станції з комфортним запасом.
+              </p>
+            </div>
+          </div>
+          <p class="summary-value" id="total-buffered">0 Wh</p>
+          <p class="summary-helper" id="buffer-helper">Враховано сумарний ККД інвертора та резерв батареї (94%).</p>
+        </article>
+        <article class="summary-card">
+          <h3>Максимальна потужність навантаження</h3>
+          <p class="summary-value" id="total-power">0 W</p>
+          <p class="summary-helper">Сумарна миттєва потужність усіх вибраних пристроїв.</p>
+        </article>
+        <article class="summary-card recommendation" id="recommendation-card">
+          <div class="recommendation-header">
+            <h3>Рекомендована станція</h3>
+            <span id="match-label" class="match-label">Очікування даних…</span>
+          </div>
+          <div class="recommendation-body">
+            <div class="recommendation-info">
+              <p class="recommendation-title" id="station-name">Оберіть пристрої для рекомендації</p>
+              <dl class="recommendation-specs" id="station-specs"></dl>
+              <div class="primary-actions">
+                <a class="buy-button disabled" id="station-link" href="#" target="_blank" rel="noopener noreferrer">
+                  Купити станцію
+                </a>
+                <a
+                  class="consult-button disabled"
+                  id="station-consult"
+                  href="https://martin-shop.online/contact/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Потрібна консультація
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="alternatives" id="alternatives-section">
+        <div class="section-heading">
+          <h2>Доступні варіанти</h2>
+          <p>Нижче наведені зарядні станції, що також можуть підійти під ваші потреби.</p>
+        </div>
+        <div class="alternative-grid" id="alternative-list"></div>
+      </section>
+
+      <section class="breakdown" id="breakdown" aria-label="Розподіл споживання за категоріями">
+        <div class="section-heading">
+          <h2>Розподіл споживання</h2>
+          <p>Перегляньте, які категорії техніки формують найбільше навантаження.</p>
+        </div>
+        <div class="breakdown-grid" id="category-breakdown"></div>
+      </section>
+
+      <footer class="app-footer">
+        <p>
+          * Результати є орієнтовними та можуть відрізнятися залежно від фактичного споживання вашої техніки. Для точного
+          підбору зверніться до фахівців.
+        </p>
+      </footer>
+    </main>
+
+    <div
+      class="share-dialog"
+      id="share-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="share-dialog-title"
+      data-open="false"
+      hidden
+    >
+      <div class="share-backdrop" data-share-close aria-hidden="true"></div>
+      <div class="share-panel" role="document">
+        <header class="share-panel-header">
+          <h2 id="share-dialog-title">Поділитися конфігурацією</h2>
+          <button type="button" class="share-close" data-share-close aria-label="Закрити вікно">✕</button>
+        </header>
+        <p class="share-panel-lead">Оберіть зручний спосіб, щоб надіслати сценарій друзям або колегам.</p>
+        <div class="share-options" role="list">
+          <a class="share-option" data-network="telegram" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>Telegram</span>
+          </a>
+          <a class="share-option" data-network="viber" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>Viber</span>
+          </a>
+          <a class="share-option" data-network="whatsapp" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>WhatsApp</span>
+          </a>
+          <a class="share-option" data-network="facebook" role="listitem" target="_blank" rel="noopener noreferrer" href="#">
+            <span>Facebook</span>
+          </a>
+        </div>
+        <div class="share-url">
+          <input type="text" id="share-url" readonly aria-label="Посилання на конфігурацію" />
+          <button type="button" id="copy-share-link" class="copy-share">Скопіювати</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
